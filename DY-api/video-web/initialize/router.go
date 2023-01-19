@@ -1,8 +1,17 @@
+/*
+ * @Date: 2023-01-19 11:21:47
+ * @LastEditors: zhang zhao
+ * @LastEditTime: 2023-01-19 14:42:37
+ * @FilePath: /simple-DY/DY-api/video-web/initialize/router.go
+ * @Description:
+ */
 package initialize
 
 import (
-	"github.com/gin-gonic/gin"
+	"simple-DY/DY-api/video-web/api"
 	"simple-DY/DY-api/video-web/middlewares"
+
+	"github.com/gin-gonic/gin"
 
 	"net/http"
 )
@@ -16,6 +25,39 @@ func Routers() *gin.Engine {
 			"success": true,
 		})
 	})
+
+	DouyinRouter := Router.Group("/douyin")
+
+	DouyinRouter.GET("/feed/", middlewares.Cors(), api.Feed)
+
+	// // 1.2 视频上传及发布
+	// PublishRouter := DouyinRouter.Group("/publish")
+	// {
+	// 	// 1.2.1 视频发布列表
+	// 	// 用户的视频发布列表，直接列出用户所有投稿过的视频
+	// 	PublishRouter.GET("/list/", jwt.Auth(), api.PublishList)
+
+	// 	// 1.2.2 投稿接口
+	// 	// 登录用户选择视频上传
+	// 	PublishRouter.POST("/action/", jwt.AuthBody(), api.PublishAction)
+	// }
+
+	// // 1.3 用户操作
+	// UserRouter := DouyinRouter.Group("/user")
+	// {
+	// 	// 1.3.1 用户信息
+	// 	// 获取用户的 id、昵称，如果实现社交部分的功能，还会返回关注数和粉丝数
+	// 	UserRouter.GET("/", jwt.Auth(), api.User)
+
+	// 	// 1.3.2 用户注册
+	// 	// 新用户注册时提供用户名，密码，昵称即可，用户名需要保证唯一。创建成功后返回用户 id 和权限token
+	// 	UserRouter.POST("/register/", api.UserRegister)
+
+	// 	// 1.3.3 用户登录
+	// 	// 通过用户名和密码进行登录，登录成功后返回用户 id 和权限 token
+	// 	UserRouter.POST("/login/", api.UserLogin)
+
+	// }
 
 	//配置跨域
 	Router.Use(middlewares.Cors())
