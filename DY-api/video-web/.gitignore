@@ -1,2 +1,3 @@
-video-web
+*.log
 *.yaml
+video-web

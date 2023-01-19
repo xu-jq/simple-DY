@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-19 14:42:37
+ * @LastEditTime: 2023-01-19 17:02:04
  * @FilePath: /simple-DY/DY-api/video-web/initialize/router.go
  * @Description:
  */
@@ -16,8 +16,15 @@ import (
 	"net/http"
 )
 
-func Routers() *gin.Engine {
+func Routers(debug bool) *gin.Engine {
+	if debug {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	Router := gin.Default()
+
 	// 开启健康检查
 	Router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -26,20 +33,34 @@ func Routers() *gin.Engine {
 		})
 	})
 
+	// 1. 基础接口
 	DouyinRouter := Router.Group("/douyin")
 
-	DouyinRouter.GET("/feed/", middlewares.Cors(), api.Feed)
+	// 1.1 视频流接口
+	// 不限制登录状态，返回按投稿时间倒序的视频列表，视频数由服务端控制，单次最多30个
+	DouyinRouter.GET(
+		"/feed/",
+		api.Feed,
+	)
 
 	// // 1.2 视频上传及发布
 	// PublishRouter := DouyinRouter.Group("/publish")
 	// {
 	// 	// 1.2.1 视频发布列表
 	// 	// 用户的视频发布列表，直接列出用户所有投稿过的视频
-	// 	PublishRouter.GET("/list/", jwt.Auth(), api.PublishList)
+	// 	PublishRouter.GET(
+	// 		"/list/",
+	// 		jwt.Auth(),
+	// 		api.PublishList,
+	// 	)
 
 	// 	// 1.2.2 投稿接口
 	// 	// 登录用户选择视频上传
-	// 	PublishRouter.POST("/action/", jwt.AuthBody(), api.PublishAction)
+	// 	PublishRouter.POST(
+	// 		"/action/",
+	// 		jwt.AuthBody(),
+	// 		api.PublishAction,
+	// 	)
 	// }
 
 	// // 1.3 用户操作
@@ -61,6 +82,7 @@ func Routers() *gin.Engine {
 
 	//配置跨域
 	Router.Use(middlewares.Cors())
+
 	//添加链路追踪
 	return Router
 }
