@@ -1,3 +1,10 @@
+/*
+ * @Date: 2023-01-19 11:21:47
+ * @LastEditors: zhang zhao
+ * @LastEditTime: 2023-01-20 17:05:51
+ * @FilePath: /simple-DY/DY-api/video-web/api/base.go
+ * @Description:
+ */
 package api
 
 import (
@@ -7,9 +14,23 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
+
+func InitGRPC() *grpc.ClientConn {
+	addr := global.GlobalConfig.GRPCServerAddress + ":" + global.GlobalConfig.GRPCServerPort
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		zap.L().Error("初始化客户端GRPC失败！错误信息为：" + err.Error())
+	} else {
+		zap.L().Info("初始化客户端GRPC成功！")
+	}
+	return conn
+}
 
 func RemoveTopStruct(fileds map[string]string) map[string]string {
 	rsp := map[string]string{}

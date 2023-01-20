@@ -1,85 +1,88 @@
 /*
  * @Date: 2023-01-19 14:08:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-19 14:34:42
+ * @LastEditTime: 2023-01-20 19:29:03
  * @FilePath: /simple-DY/DY-api/video-web/api/feed.go
  * @Description: 1.1 视频流接口
  */
 package api
 
 import (
-	"fmt"
-	"log"
+	"context"
 	"net/http"
 	"simple-DY/DY-api/video-web/models"
+	pb "simple-DY/DY-api/video-web/proto"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // 1.1 视频流接口 /douyin/feed/
 func Feed(c *gin.Context) {
-	var feedRequest models.FeedRequest
-	err := c.ShouldBindJSON(&feedRequest)
-	if err == nil {
-		log.Fatal("feedRequest error")
+
+	// 将接收的客户端请求参数绑定到结构体上
+	latestTime, err := strconv.ParseInt(c.Query("latest_time"), 10, 64)
+	if err != nil {
+		zap.L().Error("时间戳转换为整数失败！错误信息为：" + err.Error())
 	}
-	video1 := models.Video{
-		Id: 1,
-		Author: models.User{
-			Id:            1,
-			Name:          "1",
-			FollowCount:   1,
-			FollowerCount: 1,
-			IsFollow:      true,
-		},
-		PlayUrl:       "http://121.37.98.68:81/videos/example1.mp4",
-		CoverUrl:      "http://121.37.98.68:81/images/example1.jpg",
-		FavoriteCount: 1,
-		CommentCount:  1,
-		IsFavorite:    true,
-		Title:         "example1",
+	feedRequest := models.FeedRequest{
+		LatestTime: latestTime,
+		Token:      c.Query("token"),
 	}
-	video2 := models.Video{
-		Id: 2,
-		Author: models.User{
-			Id:            1,
-			Name:          "1",
-			FollowCount:   1,
-			FollowerCount: 1,
-			IsFollow:      true,
-		},
-		PlayUrl:       "http://121.37.98.68:81/videos/example2.mp4",
-		CoverUrl:      "http://121.37.98.68:81/images/example2.jpg",
-		FavoriteCount: 1,
-		CommentCount:  1,
-		IsFavorite:    true,
-		Title:         "example2",
-	}
-	video3 := models.Video{
-		Id: 3,
-		Author: models.User{
-			Id:            1,
-			Name:          "1",
-			FollowCount:   1,
-			FollowerCount: 1,
-			IsFollow:      true,
-		},
-		PlayUrl:       "http://121.37.98.68:81/videos/example3.mp4",
-		CoverUrl:      "http://121.37.98.68:81/images/example3.jpg",
-		FavoriteCount: 1,
-		CommentCount:  1,
-		IsFavorite:    true,
-		Title:         "example3",
-	}
-	c.JSON(http.StatusOK, models.FeedResponse{
-		Res: models.ResponseCodeAndMessage{
-			StatusCode: 0,
-			StatusMsg:  "获取视频流成功",
-		},
-		NextTime:  1674048618617,
-		VideoList: []models.Video{video1, video2, video3},
+
+	// 与服务器建立GRPC连接
+	conn := InitGRPC()
+	defer conn.Close()
+
+	cpb := pb.NewFeedClient(conn)
+
+	// 将接收到的请求通过GRPC转发给服务端并接收响应
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	responseFeed, err := cpb.Feed(ctx, &pb.DouyinFeedRequest{
+		LatestTime: feedRequest.LatestTime,
+		Token:      feedRequest.Token,
 	})
+	if err != nil {
+		zap.L().Error("GRPC失败！错误信息为：" + err.Error())
+	}
 
-	fmt.Println("success!")
+	zap.L().Info("通过GRPC接收到的响应为：" + responseFeed.String())
 
+	// 处理接收到的数据
+	videolistLen := len(responseFeed.GetVideoList())
+	videolist := make([]models.Video, videolistLen)
+
+	responseFeedVideoList := responseFeed.GetVideoList()
+
+	for idx := 0; idx < videolistLen; idx += 1 {
+		videolist[idx].Id = responseFeedVideoList[idx].GetId()
+		videolist[idx].Author = models.User{
+			Id:            responseFeedVideoList[idx].GetAuthor().GetId(),
+			Name:          responseFeedVideoList[idx].GetAuthor().GetName(),
+			FollowCount:   0,
+			FollowerCount: 0,
+			IsFollow:      false,
+		}
+		videolist[idx].PlayUrl = responseFeedVideoList[idx].GetPlayUrl()
+		videolist[idx].CoverUrl = responseFeedVideoList[idx].GetCoverUrl()
+		videolist[idx].FavoriteCount = 0
+		videolist[idx].CommentCount = 0
+		videolist[idx].IsFavorite = false
+		videolist[idx].Title = responseFeedVideoList[idx].GetTitle()
+	}
+
+	// 将接收的服务端响应绑定到结构体上
+	feedResponse := models.FeedResponse{
+		Res: models.ResponseCodeAndMessage{
+			StatusCode: responseFeed.GetStatusCode(),
+			StatusMsg:  responseFeed.GetStatusMsg(),
+		},
+		NextTime:  responseFeed.GetNextTime(),
+		VideoList: videolist,
+	}
+
+	c.JSON(http.StatusOK, feedResponse)
 }

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-19 14:32:35
+ * @LastEditTime: 2023-01-20 16:57:45
  * @FilePath: /simple-DY/DY-api/video-web/models/request.go
  * @Description: 后端接收请求的结构体
  */
@@ -10,8 +10,8 @@ package models
 
 // 1.1 视频流接口 请求参数​
 type FeedRequest struct {
-	LastTime int64  `json:"last_time"` // 可选参数，限制返回视频的最新投稿时间戳，精确到秒，不填表示当前时间
-	Token    string `json:"token"`     // 用户登录状态下设置
+	LatestTime int64  `json:"latest_time"` // 可选参数，限制返回视频的最新投稿时间戳，精确到秒，不填表示当前时间
+	Token      string `json:"token"`       // 用户登录状态下设置
 }
 
 // 1.2.1 视频发布列表 请求参数

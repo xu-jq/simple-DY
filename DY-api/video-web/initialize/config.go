@@ -1,9 +1,9 @@
 /*
  * @Date: 2023-01-19 15:53:00
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-19 16:56:02
+ * @LastEditTime: 2023-01-20 17:47:13
  * @FilePath: /simple-DY/DY-api/video-web/initialize/config.go
- * @Description:
+ * @Description: 全局配置初始化
  */
 package initialize
 
