@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-20 22:43:38
+ * @LastEditTime: 2023-01-21 12:20:30
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/feed.go
  * @Description: Feed服务
  */
@@ -21,11 +21,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-type server struct {
+type feedserver struct {
 	pb.UnimplementedFeedServer
 }
 
-func (s *server) Feed(ctx context.Context, in *pb.DouyinFeedRequest) (*pb.DouyinFeedResponse, error) {
+func (s *feedserver) Feed(ctx context.Context, in *pb.DouyinFeedRequest) (*pb.DouyinFeedResponse, error) {
 
 	// 获取请求的时间戳
 	timeStamp := in.GetLatestTime() / 1000
@@ -79,14 +79,14 @@ func (s *server) Feed(ctx context.Context, in *pb.DouyinFeedRequest) (*pb.Douyin
 	return &feedResponse, nil
 }
 
-func FeedService() {
+func FeedService(port string) {
 	defer global.Wg.Done()
-	lis, err := net.Listen("tcp", ":"+global.GlobalConfig.GRPCServerPort)
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		zap.L().Error("无法监听客户端！错误信息为：" + err.Error())
 	}
 	s := grpc.NewServer()
-	pb.RegisterFeedServer(s, &server{})
+	pb.RegisterFeedServer(s, &feedserver{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		zap.L().Error("无法提供服务！错误信息为：" + err.Error())

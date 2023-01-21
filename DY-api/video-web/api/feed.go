@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 14:08:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-20 19:29:03
+ * @LastEditTime: 2023-01-21 12:32:11
  * @FilePath: /simple-DY/DY-api/video-web/api/feed.go
  * @Description: 1.1 视频流接口
  */
@@ -10,6 +10,7 @@ package api
 import (
 	"context"
 	"net/http"
+	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/models"
 	pb "simple-DY/DY-api/video-web/proto"
 	"strconv"
@@ -33,8 +34,10 @@ func Feed(c *gin.Context) {
 	}
 
 	// 与服务器建立GRPC连接
-	conn := InitGRPC()
+	conn := InitGRPC(global.GlobalConfig.GRPCServerFeedPort)
 	defer conn.Close()
+
+	zap.L().Info("服务器端口为：" + global.GlobalConfig.GRPCServerFeedPort)
 
 	cpb := pb.NewFeedClient(conn)
 
