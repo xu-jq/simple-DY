@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-20 17:47:43
+ * @LastEditTime: 2023-01-22 18:25:38
  * @FilePath: /simple-DY/DY-srvs/video-srv/initialize/logger.go
  * @Description:  zap日志框架配置
  */

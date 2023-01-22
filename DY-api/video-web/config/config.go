@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-21 12:25:24
+ * @LastEditTime: 2023-01-22 18:09:17
  * @FilePath: /simple-DY/DY-api/video-web/config/config.go
  * @Description: 配置文件结构体
  */
-
 package config
 
 type Config struct {
@@ -28,4 +27,7 @@ type Config struct {
 	StaticPath                  string // 静态资源地址
 	VideoPath                   string // 视频存放地址
 	ImagePath                   string // 图片存放地址
+	JwtSecret                   string // jwt密钥
+	TimeString                  string // 时间格式化格式
+	TokenExpiresTime            int64  // token过期时间
 }

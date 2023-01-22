@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 14:08:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-21 12:32:11
+ * @LastEditTime: 2023-01-22 21:30:11
  * @FilePath: /simple-DY/DY-api/video-web/api/feed.go
  * @Description: 1.1 视频流接口
  */
@@ -87,5 +87,11 @@ func Feed(c *gin.Context) {
 		VideoList: videolist,
 	}
 
-	c.JSON(http.StatusOK, feedResponse)
+	// 根据不同的返回状态码设置不同的http状态码
+	if feedResponse.Res.StatusCode == 0 {
+		c.JSON(http.StatusOK, feedResponse)
+	} else {
+		c.JSON(http.StatusBadRequest, feedResponse)
+	}
+	zap.L().Info("返回响应成功！")
 }

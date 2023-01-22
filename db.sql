@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-19 18:39:07
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-21 17:31:35
- * @FilePath: /simple-DY/DY-srvs/video-srv/config/video.sql
+ * @LastEditTime: 2023-01-22 20:12:41
+ * @FilePath: /simple-DY/db.sql
  * @Description: 数据库初始SQL操作
  */
 
@@ -77,13 +77,13 @@ CREATE TABLE `messages` (
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户id，自增主键',
-  `name` varchar(255) NOT NULL COMMENT '用户名',
-  `password` varchar(255) NOT NULL COMMENT '用户密码',
+  `name` varchar(255) BINARY NOT NULL COMMENT '用户名',
+  `password` varchar(255) BINARY NOT NULL COMMENT '用户密码',
   PRIMARY KEY (`id`),
   KEY `name_password_idx` (`name`,`password`) USING BTREE COMMENT '用户名和密码的联合索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='用户表';
 
-INSERT INTO users (name,password) VALUES ('ZhangZhao','ZhangZhaoPassword');
+INSERT INTO users (name,password) VALUES ('test','47ec2dd791e31e2ef2076caf64ed9b3d');
 
 
 -- simpledy.videos definition

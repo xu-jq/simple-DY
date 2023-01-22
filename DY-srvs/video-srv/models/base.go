@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-20 20:50:51
+ * @LastEditTime: 2023-01-22 18:05:24
  * @FilePath: /simple-DY/DY-srvs/video-srv/models/base.go
  * @Description:
  */
@@ -11,6 +11,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"simple-DY/DY-srvs/video-srv/global"
 	"time"
 
 	"gorm.io/gorm"
@@ -39,7 +40,7 @@ type LocalTime time.Time
 
 func (t *LocalTime) MarshalJSON() ([]byte, error) {
 	tTime := time.Time(*t)
-	return []byte(fmt.Sprintf("\"%v\"", tTime.Format("2006-01-02 15:04:05"))), nil
+	return []byte(fmt.Sprintf("\"%v\"", tTime.Format(global.GlobalConfig.TimeString))), nil
 }
 
 // Value方法即在存储时调⽤，将该方法的返回值进行存储，该方法可以实现数据存储前对数据进行相关操作。

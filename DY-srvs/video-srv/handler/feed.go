@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-21 12:20:30
+ * @LastEditTime: 2023-01-22 21:31:45
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/feed.go
  * @Description: Feed服务
  */
@@ -29,7 +29,7 @@ func (s *feedserver) Feed(ctx context.Context, in *pb.DouyinFeedRequest) (*pb.Do
 
 	// 获取请求的时间戳
 	timeStamp := in.GetLatestTime() / 1000
-	zap.L().Info("此请求的时间是：" + time.Unix(timeStamp, 0).Format("2006-01-02 15:04:05"))
+	zap.L().Info("此请求的时间是：" + time.Unix(timeStamp, 0).Format(global.GlobalConfig.TimeString))
 
 	// 查询前30个视频
 	videoQuery := global.DB.Model(&models.Videos{}).Where("UNIX_TIMESTAMP(videos.publish_time) < " + strconv.FormatInt(timeStamp, 10)).Order("publish_time DESC").Limit(30)
@@ -47,7 +47,7 @@ func (s *feedserver) Feed(ctx context.Context, in *pb.DouyinFeedRequest) (*pb.Do
 	result := []map[string]interface{}{}
 	global.DB.Table("(?) as v", videoQuery).Select("v.id, v.author_id, v.file_name, v.video_suffix, UNIX_TIMESTAMP(v.publish_time) as t, v.title, users.name").Joins("left join users on v.author_id = users.id").Scan(&result)
 
-	zap.L().Info("数据库查询完成！")
+	zap.L().Info("获取视频流成功！")
 
 	videolistLen := len(result)
 
