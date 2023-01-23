@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 18:05:24
+ * @LastEditTime: 2023-01-23 11:14:13
  * @FilePath: /simple-DY/DY-srvs/video-srv/models/base.go
  * @Description:
  */

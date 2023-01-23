@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-20 16:57:45
+ * @LastEditTime: 2023-01-23 09:51:48
  * @FilePath: /simple-DY/DY-api/video-web/models/request.go
  * @Description: 后端接收请求的结构体
  */

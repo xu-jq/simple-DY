@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 21:31:45
+ * @LastEditTime: 2023-01-23 12:02:30
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/feed.go
  * @Description: Feed服务
  */
@@ -32,11 +32,11 @@ func (s *feedserver) Feed(ctx context.Context, in *pb.DouyinFeedRequest) (*pb.Do
 	zap.L().Info("此请求的时间是：" + time.Unix(timeStamp, 0).Format(global.GlobalConfig.TimeString))
 
 	// 查询前30个视频
-	videoQuery := global.DB.Model(&models.Videos{}).Where("UNIX_TIMESTAMP(videos.publish_time) < " + strconv.FormatInt(timeStamp, 10)).Order("publish_time DESC").Limit(30)
+	videoQuery := global.DB.Model(&models.Videos{}).Where("videos.publish_time < " + strconv.FormatInt(timeStamp, 10)).Order("publish_time DESC").Limit(30)
 
 	// 查询前30个视频的最早时间
 	latestTimeStamp := map[string]interface{}{}
-	global.DB.Table("(?) as u", videoQuery).Select("UNIX_TIMESTAMP(publish_time) as t").Order("publish_time ASC").Limit(1).Find(&latestTimeStamp)
+	global.DB.Table("(?) as u", videoQuery).Select("publish_time as t").Order("publish_time ASC").Limit(1).Find(&latestTimeStamp)
 
 	// 数据库中没有更早的视频，就直接使用当前的时间戳替换
 	if len(latestTimeStamp) == 0 {

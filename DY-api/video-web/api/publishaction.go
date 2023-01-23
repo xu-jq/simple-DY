@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 22:35:01
+ * @LastEditTime: 2023-01-23 10:12:47
  * @FilePath: /simple-DY/DY-api/video-web/api/publishaction.go
  * @Description: 1.2.2 投稿接口
  */
@@ -9,7 +9,7 @@ package api
 
 import (
 	"context"
-	"fmt"
+	"io"
 	"net/http"
 	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/models"
@@ -24,16 +24,16 @@ import (
 
 func PublishAction(c *gin.Context) {
 
-	// // 将接收的客户端请求参数绑定到结构体上
-	// video, err := c.FormFile("data")
+	// 将接收的客户端请求参数绑定到结构体上
+	video, _ := c.FormFile("data")
+	videoFile, _ := video.Open()
+	videoByte, _ := io.ReadAll(videoFile)
 
 	publishActionRequest := models.PublishActionRequest{
-		// Data: video,
+		Data:  videoByte,
 		Token: c.PostForm("token"),
 		Title: c.PostForm("title"),
 	}
-
-	fmt.Println(publishActionRequest)
 
 	// 与服务器建立GRPC连接
 	conn := InitGRPC(global.GlobalConfig.GRPCServerPublishActionPort)

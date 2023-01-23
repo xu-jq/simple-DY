@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 19:46:14
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-20 21:16:07
+ * @LastEditTime: 2023-01-23 12:07:29
  * @FilePath: /simple-DY/DY-srvs/video-srv/models/db.go
  * @Description: 数据库结构体
  */
@@ -19,7 +19,7 @@ type Videos struct {
 	AuthorId    int64
 	FileName    string
 	VideoSuffix string
-	PublishTime *LocalTime
+	PublishTime int64
 	Title       string
 }
 

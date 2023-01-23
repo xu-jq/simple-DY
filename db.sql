@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 18:39:07
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 20:12:41
+ * @LastEditTime: 2023-01-23 12:05:30
  * @FilePath: /simple-DY/db.sql
  * @Description: 数据库初始SQL操作
  */
@@ -94,13 +94,13 @@ CREATE TABLE `videos` (
   `author_id` bigint NOT NULL COMMENT '视频作者id',
   `file_name` varchar(255) NOT NULL COMMENT '文件命名',
   `video_suffix` char(10) NOT NULL COMMENT '视频后缀',
-  `publish_time` datetime NOT NULL COMMENT '发布时间',
+  `publish_time` bigint NOT NULL COMMENT '发布时间',
   `title` varchar(255) DEFAULT NULL COMMENT '视频标题',
   PRIMARY KEY (`id`),
   KEY `time_idx` (`publish_time`) USING BTREE COMMENT '发布时间索引',
   KEY `author_idx` (`author_id`) USING BTREE COMMENT '作者id索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='视频表';
 
-INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example1','.mp4',now(),'第一个视频');
-INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example2','.mp4',now(),'第二个视频');
-INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example3','.mp4',now(),'第三个视频');
+INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example1','.mp4','1674293409','第一个视频');
+INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example2','.mp4','1674291409','第二个视频');
+INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example3','.mp4','1674292409','第三个视频');
