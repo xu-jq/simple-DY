@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-20 19:24:58
+ * @LastEditTime: 2023-01-25 15:16:50
  * @FilePath: /simple-DY/DY-srvs/video-srv/main.go
  * @Description: 主程序
  */
@@ -22,12 +22,22 @@ func main() {
 	initialize.InitLogger()
 	zap.L().Info("日志配置初始化成功！")
 
+	var err error
+
 	// 初始化全局配置
-	global.GlobalConfig = initialize.InitConfig(debug)
+	global.GlobalConfig, err = initialize.InitConfig(debug)
+	if err != nil {
+		zap.L().Error("配置读取失败！错误信息：" + err.Error())
+		return
+	}
 	zap.L().Info("全局配置初始化成功！")
 
 	// 初始化数据库
-	initialize.InitDb()
+	global.DB, err = initialize.InitDb()
+	if err != nil {
+		zap.L().Error("连接数据库失败！错误信息：" + err.Error())
+		return
+	}
 	zap.L().Info("数据库初始化成功！")
 
 	// 初始化服务

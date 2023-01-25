@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 21:31:19
+ * @LastEditTime: 2023-01-25 15:17:24
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishlist.go
  * @Description: PublishAction服务
  */
@@ -77,17 +77,18 @@ func (s *publishlistserver) PublishList(ctx context.Context, in *pb.DouyinPublis
 		VideoList:  make([]*pb.Video, videolistLen),
 	}
 
-	urlprefix := global.GlobalConfig.NginxAddress + ":" + global.GlobalConfig.NginxPort + "/"
+	urlprefix := global.GlobalConfig.OSS.Address + strconv.FormatInt(in.UserId, 10)
 
 	for idx := 0; idx < videolistLen; idx += 1 {
+		filename := result[idx]["file_name"].(string)
 		publishListResponse.VideoList[idx] = &pb.Video{
 			Id: result[idx]["id"].(int64),
 			Author: &pb.User{
 				Id:   in.UserId,
 				Name: user.Name,
 			},
-			PlayUrl:  urlprefix + global.GlobalConfig.VideoPath + strconv.FormatInt(in.UserId, 10) + "/" + result[idx]["file_name"].(string) + result[idx]["video_suffix"].(string),
-			CoverUrl: urlprefix + global.GlobalConfig.ImagePath + strconv.FormatInt(in.UserId, 10) + "/" + result[idx]["file_name"].(string) + ".jpg",
+			PlayUrl:  urlprefix + global.GlobalConfig.OSS.VideoPath + filename + global.GlobalConfig.OSS.VideoSuffix,
+			CoverUrl: urlprefix + global.GlobalConfig.OSS.ImagePath + filename + global.GlobalConfig.OSS.ImageSuffix,
 			Title:    result[idx]["title"].(string),
 		}
 	}
@@ -101,12 +102,12 @@ func PublishListService(port string) {
 	defer global.Wg.Done()
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
-		zap.L().Error("无法监听客户端！错误信息为：" + err.Error())
+		zap.L().Error("无法监听客户端！错误信息：" + err.Error())
 	}
 	s := grpc.NewServer()
 	pb.RegisterPublishListServer(s, &publishlistserver{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		zap.L().Error("无法提供服务！错误信息为：" + err.Error())
+		zap.L().Error("无法提供服务！错误信息：" + err.Error())
 	}
 }

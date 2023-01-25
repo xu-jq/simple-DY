@@ -1,9 +1,9 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-23 11:14:13
+ * @LastEditTime: 2023-01-25 15:18:32
  * @FilePath: /simple-DY/DY-srvs/video-srv/models/base.go
- * @Description:
+ * @Description: 涉及Gorm自定义读入读出的部分，暂时没用上
  */
 package models
 
@@ -29,7 +29,7 @@ func (g *GormList) Scan(value interface{}) error {
 }
 
 type BaseModel struct {
-	ID        int32          `gorm:"primarykey;type:int" json:"id"` //为什么使用int32， bigint
+	ID        int32          `gorm:"primarykey;type:int" json:"id"` // 为什么使用int32， bigint
 	CreatedAt time.Time      `gorm:"column:add_time" json:"-"`
 	UpdatedAt time.Time      `gorm:"column:update_time" json:"-"`
 	DeletedAt gorm.DeletedAt `json:"-"`
@@ -40,7 +40,7 @@ type LocalTime time.Time
 
 func (t *LocalTime) MarshalJSON() ([]byte, error) {
 	tTime := time.Time(*t)
-	return []byte(fmt.Sprintf("\"%v\"", tTime.Format(global.GlobalConfig.TimeString))), nil
+	return []byte(fmt.Sprintf("\"%v\"", tTime.Format(global.GlobalConfig.Time.TimeFormat))), nil
 }
 
 // Value方法即在存储时调⽤，将该方法的返回值进行存储，该方法可以实现数据存储前对数据进行相关操作。

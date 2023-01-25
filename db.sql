@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 18:39:07
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-23 12:05:30
+ * @LastEditTime: 2023-01-25 14:09:01
  * @FilePath: /simple-DY/db.sql
  * @Description: 数据库初始SQL操作
  */
@@ -16,10 +16,10 @@
 -- USE simpledy;
 
 
--- simpledy.comments definition
+-- commen s definition
 
 DROP TABLE IF EXISTS `comments`;
-CREATE TABLE `comments` (
+CREATE TABLE ` omments` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评论id，自增主键',
   `user_id` bigint NOT NULL COMMENT '评论发布用户id',
   `video_id` bigint NOT NULL COMMENT '被评论视频的id',
@@ -30,10 +30,10 @@ CREATE TABLE `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='评论表';
 
 
--- simpledy.follows definition
+-- follow  definition
 
 DROP TABLE IF EXISTS `follows`;
-CREATE TABLE `follows` (
+CREATE TABLE `fo lows` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `user_id` bigint NOT NULL COMMENT '用户id',
   `follower_id` bigint NOT NULL COMMENT '关注的用户',
@@ -43,7 +43,7 @@ CREATE TABLE `follows` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='关注表';
 
 
--- simpledy.likes definition
+-- likes  efinition
 
 DROP TABLE IF EXISTS `likes`;
 CREATE TABLE `likes` (
@@ -57,10 +57,10 @@ CREATE TABLE `likes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='点赞表';
 
 
--- simpledy.messages definition
+-- messag s definition
 
 DROP TABLE IF EXISTS `messages`;
-CREATE TABLE `messages` (
+CREATE TABLE ` essages` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `user_id` bigint NOT NULL COMMENT '发送消息的用户id',
   `to_user_id` bigint NOT NULL COMMENT '接收消息的用户id',
@@ -72,7 +72,7 @@ CREATE TABLE `messages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='消息表';
 
 
--- simpledy.users definition
+-- users  efinition
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
@@ -83,17 +83,18 @@ CREATE TABLE `users` (
   KEY `name_password_idx` (`name`,`password`) USING BTREE COMMENT '用户名和密码的联合索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='用户表';
 
-INSERT INTO users (name,password) VALUES ('test','47ec2dd791e31e2ef2076caf64ed9b3d');
+INSERT INTO users (id, name, password) VALUES(1, 'test1', '4a3252a5edf8fcaa8bde0bfcce79560d');
+INSERT INTO users (id, name, password) VALUES(2, 'test2', '80660e29103d525b694f45e34e23f498');
+INSERT INTO users (id, name, password) VALUES(3, 'test3', 'ed05155fbf4f7a6373bc7c344be065bd');
 
 
--- simpledy.videos definition
+-- videos definition
 
 DROP TABLE IF EXISTS `videos`;
 CREATE TABLE `videos` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '视频唯一id，自增主键',
   `author_id` bigint NOT NULL COMMENT '视频作者id',
   `file_name` varchar(255) NOT NULL COMMENT '文件命名',
-  `video_suffix` char(10) NOT NULL COMMENT '视频后缀',
   `publish_time` bigint NOT NULL COMMENT '发布时间',
   `title` varchar(255) DEFAULT NULL COMMENT '视频标题',
   PRIMARY KEY (`id`),
@@ -101,6 +102,13 @@ CREATE TABLE `videos` (
   KEY `author_idx` (`author_id`) USING BTREE COMMENT '作者id索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='视频表';
 
-INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example1','.mp4','1674293409','第一个视频');
-INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example2','.mp4','1674291409','第二个视频');
-INSERT INTO videos (author_id, file_name, video_suffix, publish_time, title) VALUES (1,'example3','.mp4','1674292409','第三个视频');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(1, 1, 'f5316905-5a72-4380-8979-6fbc178c1ba9', 1674477443, '1粉色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(2, 1, '444be6f6-92ce-4cab-a506-c268777a80d0', 1674477471, '2粉红色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(3, 2, 'd6f03720-f0f6-47cd-8b88-01fbf827e38a', 1674477559, '3粉色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(4, 2, 'e97e550f-5b41-4603-b737-8e72b80a74e1', 1674477585, '4粉色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(5, 2, '51f50227-d61a-435f-9379-44e5c0220689', 1674477606, '5粉色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(6, 3, '64647d28-3853-4414-b6ad-8f5b43fe9c5c', 1674477656, '6紫色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(7, 3, '360f2aeb-072c-47ce-bc2c-003e0f285df2', 1674477676, '7紫色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(8, 3, 'fc222697-e128-4f14-abb1-da8d04bdb44b', 1674477693, '8紫色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(9, 3, '675106e1-0f1a-4055-bd22-6995d7cc3417', 1674477706, '9蓝色');
+INSERT INTO videos (id, author_id, file_name, publish_time, title) VALUES(10, 3, 'beec5a6f-3ea1-4e18-bd5a-196865bc3f3c', 1674477721, '10浅蓝色');

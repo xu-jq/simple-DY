@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 22:55:26
+ * @LastEditTime: 2023-01-25 16:06:43
  * @FilePath: /simple-DY/DY-api/video-web/initialize/router.go
  * @Description: 路由表
  */

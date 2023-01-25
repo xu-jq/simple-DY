@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 14:08:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 21:30:11
+ * @LastEditTime: 2023-01-25 15:44:23
  * @FilePath: /simple-DY/DY-api/video-web/api/feed.go
  * @Description: 1.1 视频流接口
  */
@@ -26,7 +26,7 @@ func Feed(c *gin.Context) {
 	// 将接收的客户端请求参数绑定到结构体上
 	latestTime, err := strconv.ParseInt(c.Query("latest_time"), 10, 64)
 	if err != nil {
-		zap.L().Error("时间戳转换为整数失败！错误信息为：" + err.Error())
+		zap.L().Error("时间戳转换为整数失败！错误信息：" + err.Error())
 	}
 	feedRequest := models.FeedRequest{
 		LatestTime: latestTime,
@@ -34,25 +34,25 @@ func Feed(c *gin.Context) {
 	}
 
 	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPCServerFeedPort)
+	conn := InitGRPC(global.GlobalConfig.GRPC.FeedPort)
 	defer conn.Close()
 
-	zap.L().Info("服务器端口为：" + global.GlobalConfig.GRPCServerFeedPort)
+	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.FeedPort)
 
 	cpb := pb.NewFeedClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
 	responseFeed, err := cpb.Feed(ctx, &pb.DouyinFeedRequest{
 		LatestTime: feedRequest.LatestTime,
 		Token:      feedRequest.Token,
 	})
 	if err != nil {
-		zap.L().Error("GRPC失败！错误信息为：" + err.Error())
+		zap.L().Error("GRPC失败！错误信息：" + err.Error())
 	}
 
-	zap.L().Info("通过GRPC接收到的响应为：" + responseFeed.String())
+	zap.L().Info("通过GRPC接收到的响应：" + responseFeed.String())
 
 	// 处理接收到的数据
 	videolistLen := len(responseFeed.GetVideoList())

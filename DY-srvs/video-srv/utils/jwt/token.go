@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-22 17:38:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 19:34:36
+ * @LastEditTime: 2023-01-25 15:18:16
  * @FilePath: /simple-DY/DY-srvs/video-srv/utils/jwt/token.go
  * @Description: 调用jwt产生Token
  */
@@ -22,8 +22,8 @@ func GenerateToken(id int64) string {
 	zap.L().Info("开始产生Token...")
 
 	// 设置Token过期时间
-	expiresTime := time.Now().Unix() + global.GlobalConfig.TokenExpiresTime
-	zap.L().Info("Token将于" + time.Unix(expiresTime, 0).Format(global.GlobalConfig.TimeString) + "过期")
+	expiresTime := time.Now().Unix() + global.GlobalConfig.JWT.TokenExpiresTime
+	zap.L().Info("Token将于" + time.Unix(expiresTime, 0).Format(global.GlobalConfig.Time.TimeFormat) + "过期")
 
 	// 声明
 	claims := jwt.StandardClaims{
@@ -37,11 +37,11 @@ func GenerateToken(id int64) string {
 
 	// 生成Token
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString([]byte(global.GlobalConfig.JwtSecret))
+	token, err := tokenClaims.SignedString([]byte(global.GlobalConfig.JWT.Secret))
 
 	// 判断生成Token是否成功
 	if err != nil {
-		zap.L().Error("生成Token失败！错误信息为：" + err.Error())
+		zap.L().Error("生成Token失败！错误信息：" + err.Error())
 	} else {
 		token = "Bearer " + token
 		zap.L().Info("生成Token成功！")
@@ -52,7 +52,7 @@ func GenerateToken(id int64) string {
 // 解析token
 func ParseToken(token string) (*jwt.StandardClaims, error) {
 	jwtToken, err := jwt.ParseWithClaims(token, &jwt.StandardClaims{}, func(token *jwt.Token) (i interface{}, e error) {
-		return []byte(global.GlobalConfig.JwtSecret), nil
+		return []byte(global.GlobalConfig.JWT.Secret), nil
 	})
 	if err == nil && jwtToken != nil {
 		if claim, ok := jwtToken.Claims.(*jwt.StandardClaims); ok && jwtToken.Valid {
@@ -60,6 +60,6 @@ func ParseToken(token string) (*jwt.StandardClaims, error) {
 			return claim, nil
 		}
 	}
-	zap.L().Error("Token解析失败！错误信息为：" + err.Error())
+	zap.L().Error("Token解析失败！错误信息：" + err.Error())
 	return nil, err
 }

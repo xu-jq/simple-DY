@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-23 10:12:47
+ * @LastEditTime: 2023-01-25 15:44:35
  * @FilePath: /simple-DY/DY-api/video-web/api/publishaction.go
  * @Description: 1.2.2 投稿接口
  */
@@ -36,15 +36,15 @@ func PublishAction(c *gin.Context) {
 	}
 
 	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPCServerPublishActionPort)
+	conn := InitGRPC(global.GlobalConfig.GRPC.PublishActionPort)
 	defer conn.Close()
 
-	zap.L().Info("服务器端口为：" + global.GlobalConfig.GRPCServerPublishActionPort)
+	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.PublishActionPort)
 
 	cpb := pb.NewPublishActionClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.FileSecond))
 	defer cancel()
 
 	responsePublishAction, err := cpb.PublishAction(ctx, &pb.DouyinPublishActionRequest{
@@ -54,10 +54,10 @@ func PublishAction(c *gin.Context) {
 	})
 
 	if err != nil {
-		zap.L().Error("GRPC失败！错误信息为：" + err.Error())
+		zap.L().Error("GRPC失败！错误信息：" + err.Error())
 	}
 
-	zap.L().Info("通过GRPC接收到的响应为：" + responsePublishAction.String())
+	zap.L().Info("通过GRPC接收到的响应：" + responsePublishAction.String())
 
 	// 将接收的服务端响应绑定到结构体上
 	publishActionResponse := models.PublishActionResponse{

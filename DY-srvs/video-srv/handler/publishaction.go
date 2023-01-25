@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-23 15:37:48
+ * @LastEditTime: 2023-01-25 15:17:01
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishaction.go
  * @Description: PublishAction服务
  */
@@ -17,6 +17,7 @@ import (
 	pb "simple-DY/DY-srvs/video-srv/proto"
 	"simple-DY/DY-srvs/video-srv/utils/ffmpeg"
 	"simple-DY/DY-srvs/video-srv/utils/jwt"
+	"simple-DY/DY-srvs/video-srv/utils/oss"
 	"strconv"
 	"strings"
 	"time"
@@ -60,42 +61,75 @@ func (s *publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 		return &publishActionResponse, nil
 	}
 
-	// 判断文件夹路径是否存在并创建
-	videoPath := global.GlobalConfig.StaticPath + global.GlobalConfig.VideoPath + tokenId.Id + "/"
-	imagePath := global.GlobalConfig.StaticPath + global.GlobalConfig.ImagePath + tokenId.Id + "/"
-	_, err := os.Stat(videoPath)
+	// 将视频文件和图片文件存储在本地进行备份
+
+	// 判断用户的文件夹路径是否存在并创建
+
+	// 用户文件夹路径
+	userPath := global.GlobalConfig.StaticBackup.StaticPath + tokenId.Id
+	// 用户视频与图片的路径
+	videoStaticPath := userPath + global.GlobalConfig.StaticBackup.VideoPath
+	imageStaticPath := userPath + global.GlobalConfig.StaticBackup.ImagePath
+
+	_, err := os.Stat(userPath)
 	if os.IsNotExist(err) {
-		videoerr := os.Mkdir(videoPath, 0666)
-		imageerr := os.Mkdir(imagePath, 0666)
+		videoerr := os.MkdirAll(videoStaticPath, 0666)
+		imageerr := os.Mkdir(imageStaticPath, 0666)
 		if videoerr != nil || imageerr != nil {
-			zap.L().Error("创建文件夹失败！错误信息为：" + videoerr.Error())
+			zap.L().Error("创建文件夹失败！错误信息：" + videoerr.Error())
 		}
 	} else if err != nil {
-		zap.L().Error("判断文件夹失败！错误信息为：" + err.Error())
+		zap.L().Error("判断文件夹失败！错误信息：" + err.Error())
 	}
 
-	// 生成唯一的文件名称
-	videoName := uuid.NewV4().String()
-	videoPath = videoPath + videoName + ".mp4"
-	imagePath = imagePath + videoName + ".jpg"
+	// 生成文件名称
+	fileName := uuid.NewV4().String()
+
+	// 组装完整的文件名称
+	videoStaticFileName := videoStaticPath + fileName + global.GlobalConfig.StaticBackup.VideoSuffix
+	imageStaticFileName := imageStaticPath + fileName + global.GlobalConfig.StaticBackup.ImageSuffix
 
 	// 将字节流写入视频文件
-	err = os.WriteFile(videoPath, []byte(in.Data), 0666)
+	err = os.WriteFile(videoStaticFileName, []byte(in.Data), 0666)
 	if err != nil {
-		zap.L().Error("无法写入文件！错误信息为：" + err.Error())
+		zap.L().Error("无法写入视频文件！错误信息：" + err.Error())
 		return &publishActionResponse, nil
 	}
+	zap.L().Info("视频文件备份成功！路径：" + videoStaticFileName)
 
-	// 截取视频文件的第一帧作为封面
-	ffmpeg.ExtractFirstFrame(videoPath, imagePath)
+	// 截取视频文件的第一帧作为封面并存储
+	err = ffmpeg.ExtractFirstFrame(videoStaticFileName, imageStaticFileName)
+	if err != nil {
+		zap.L().Error("无法写入图片文件！错误信息：" + err.Error())
+		return &publishActionResponse, nil
+	}
+	zap.L().Info("图片文件备份成功！路径：" + videoStaticFileName)
+
+	videoOSSFileName := tokenId.Id + global.GlobalConfig.OSS.VideoPath + fileName + global.GlobalConfig.OSS.VideoSuffix
+	ImageOSSFileName := tokenId.Id + global.GlobalConfig.OSS.ImagePath + fileName + global.GlobalConfig.OSS.ImageSuffix
+
+	// 上传视频文件
+	err = oss.UploadFileToQiniuOSS(videoStaticFileName, videoOSSFileName)
+	if err != nil {
+		zap.L().Error("无法上传视频文件！错误信息：" + err.Error())
+		return &publishActionResponse, nil
+	}
+	zap.L().Info("视频文件上传成功！路径：" + videoOSSFileName)
+
+	// 上传图片文件
+	err = oss.UploadFileToQiniuOSS(imageStaticFileName, ImageOSSFileName)
+	if err != nil {
+		zap.L().Error("无法上传图片文件！错误信息：" + err.Error())
+		return &publishActionResponse, nil
+	}
+	zap.L().Info("图片文件上传成功！路径：" + ImageOSSFileName)
 
 	authorId, _ := strconv.ParseInt(tokenId.Id, 10, 64)
 
 	// 向数据库中插入数据
 	videoInfo := models.Videos{
 		AuthorId:    authorId,
-		FileName:    videoName,
-		VideoSuffix: ".mp4",
+		FileName:    fileName,
 		PublishTime: time.Now().Unix(),
 		Title:       in.Title,
 	}
@@ -115,12 +149,12 @@ func PublishActionService(port string) {
 	defer global.Wg.Done()
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
-		zap.L().Error("无法监听客户端！错误信息为：" + err.Error())
+		zap.L().Error("无法监听客户端！错误信息：" + err.Error())
 	}
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.MaxRecvMsgSize(1024*1024*global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB), grpc.MaxSendMsgSize(1024*1024*global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB))
 	pb.RegisterPublishActionServer(s, &publishactionserver{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		zap.L().Error("无法提供服务！错误信息为：" + err.Error())
+		zap.L().Error("无法提供服务！错误信息：" + err.Error())
 	}
 }

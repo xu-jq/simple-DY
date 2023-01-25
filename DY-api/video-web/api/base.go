@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-21 12:36:23
+ * @LastEditTime: 2023-01-25 15:15:14
  * @FilePath: /simple-DY/DY-api/video-web/api/base.go
  * @Description:
  */
@@ -22,10 +22,15 @@ import (
 )
 
 func InitGRPC(port string) *grpc.ClientConn {
-	addr := global.GlobalConfig.GRPCServerAddress + ":" + port
-	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	addr := global.GlobalConfig.GRPC.Address + ":" + port
+	size := global.GlobalConfig.GRPC.GRPCMsgSize.CommonMB
+	// 上传文件需要将传输限制开大
+	if port == "50001" {
+		size = global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB
+	}
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(1024*1024*size), grpc.MaxCallSendMsgSize(1024*1024*size)))
 	if err != nil {
-		zap.L().Error("初始化客户端GRPC失败！错误信息为：" + err.Error())
+		zap.L().Error("初始化客户端GRPC失败！错误信息：" + err.Error())
 	} else {
 		zap.L().Info("初始化客户端GRPC成功！")
 	}

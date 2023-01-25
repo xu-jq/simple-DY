@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-20 17:46:53
+ * @LastEditTime: 2023-01-25 15:17:47
  * @FilePath: /simple-DY/DY-srvs/video-srv/initialize/config.go
  * @Description: 全局配置初始化
  */
@@ -10,33 +10,48 @@ package initialize
 import (
 	"simple-DY/DY-srvs/video-srv/config"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
-func InitConfig(debug bool) config.Config {
+func InitConfig(debug bool) (config.Config, error) {
 
 	// 根据线上线下环境切换配置文件
 	filename := "config-pro.yaml"
 	if debug {
 		filename = "config-debug.yaml"
 	}
-	zap.L().Info("配置文件为" + filename)
+	zap.L().Info("配置文件：" + filename)
 
+	// viper配置
 	viper.AddConfigPath("./")     //设置读取的文件路径
 	viper.SetConfigName(filename) //设置读取的文件名
 	viper.SetConfigType("yaml")   //设置文件的类型
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		zap.L().Info("配置文件更改！" + e.Name)
+		// 打印配置信息
+		LogConfigOutput(viper.AllKeys())
+	})
+	viper.WatchConfig()
 	Config := &config.Config{}
 	//尝试进行配置读取
 	if err := viper.ReadInConfig(); err != nil {
-		zap.L().Error("配置读取失败！错误信息：" + err.Error())
-	} else {
-		viper.Unmarshal(&Config)
-
-		// 打印配置信息
-		for _, key := range viper.AllKeys() {
-			zap.L().Info(key + ": " + viper.GetString(key))
-		}
+		return *Config, err
 	}
-	return *Config
+
+	// 将配置写入结构体
+	viper.Unmarshal(&Config)
+
+	// 打印配置信息
+	LogConfigOutput(viper.AllKeys())
+
+	return *Config, nil
+}
+
+// 在日志中输出当前的配置信息
+func LogConfigOutput(allkey []string) {
+	for _, key := range allkey {
+		zap.L().Info(key + ": " + viper.GetString(key))
+	}
 }

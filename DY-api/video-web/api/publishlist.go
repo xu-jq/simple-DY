@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 21:30:19
+ * @LastEditTime: 2023-01-25 15:44:47
  * @FilePath: /simple-DY/DY-api/video-web/api/publishlist.go
  * @Description: 1.2.1 视频发布列表
  */
@@ -27,7 +27,7 @@ func PublishList(c *gin.Context) {
 	// 将接收的客户端请求参数绑定到结构体上
 	userId, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	if err != nil {
-		zap.L().Error("用户id转换为整数失败！错误信息为：" + err.Error())
+		zap.L().Error("用户id转换为整数失败！错误信息：" + err.Error())
 	}
 	publishListRequest := models.UserRequest{
 		UserId: userId,
@@ -35,25 +35,25 @@ func PublishList(c *gin.Context) {
 	}
 
 	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPCServerPublishListPort)
+	conn := InitGRPC(global.GlobalConfig.GRPC.PublishListPort)
 	defer conn.Close()
 
-	zap.L().Info("服务器端口为：" + global.GlobalConfig.GRPCServerPublishListPort)
+	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.PublishListPort)
 
 	cpb := pb.NewPublishListClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
 	responsePublishList, err := cpb.PublishList(ctx, &pb.DouyinPublishListRequest{
 		UserId: publishListRequest.UserId,
 		Token:  publishListRequest.Token,
 	})
 	if err != nil {
-		zap.L().Error("GRPC失败！错误信息为：" + err.Error())
+		zap.L().Error("GRPC失败！错误信息：" + err.Error())
 	}
 
-	zap.L().Info("通过GRPC接收到的响应为：" + responsePublishList.String())
+	zap.L().Info("通过GRPC接收到的响应：" + responsePublishList.String())
 
 	// 处理接收到的数据
 	videolistLen := len(responsePublishList.GetVideoList())

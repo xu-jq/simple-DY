@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 22:22:17
+ * @LastEditTime: 2023-01-25 15:44:57
  * @FilePath: /simple-DY/DY-api/video-web/api/userlogin.go
  * @Description: 1.3.3 用户登录
  */
@@ -28,15 +28,15 @@ func UserLogin(c *gin.Context) {
 	}
 
 	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPCServerUserLoginPort)
+	conn := InitGRPC(global.GlobalConfig.GRPC.UserLoginPort)
 	defer conn.Close()
 
-	zap.L().Info("服务器端口为：" + global.GlobalConfig.GRPCServerUserLoginPort)
+	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.UserLoginPort)
 
 	cpb := pb.NewUserLoginClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
 
 	responseUserLogin, err := cpb.UserLogin(ctx, &pb.DouyinUserLoginRequest{
@@ -44,10 +44,10 @@ func UserLogin(c *gin.Context) {
 		Password: userLoginRequest.Password,
 	})
 	if err != nil {
-		zap.L().Error("GRPC失败！错误信息为：" + err.Error())
+		zap.L().Error("GRPC失败！错误信息：" + err.Error())
 	}
 
-	zap.L().Info("通过GRPC接收到的响应为：" + responseUserLogin.String())
+	zap.L().Info("通过GRPC接收到的响应：" + responseUserLogin.String())
 
 	// 将接收的服务端响应绑定到结构体上
 	userLoginResponse := models.UserRegisterLoginResponse{

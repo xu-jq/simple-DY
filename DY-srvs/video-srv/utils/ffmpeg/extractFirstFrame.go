@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-23 14:50:51
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-23 15:16:03
+ * @LastEditTime: 2023-01-25 15:18:06
  * @FilePath: /simple-DY/DY-srvs/video-srv/utils/ffmpeg/ExtractFirstFrame.go
  * @Description:
  */
@@ -25,19 +25,18 @@ func ExampleReadFrameAsJpeg(inFileName string, frameNum int) io.Reader {
 		WithOutput(buf).
 		Run()
 	if err != nil {
-		zap.L().Error("读取视频首帧失败！错误信息为：" + err.Error())
+		zap.L().Error("读取视频首帧失败！错误信息：" + err.Error())
 	}
 	return buf
 }
 
-func ExtractFirstFrame(videoPath, imagePath string) {
+func ExtractFirstFrame(videoPath, imagePath string) (err error) {
 	reader := ExampleReadFrameAsJpeg(videoPath, 1)
 	img, err := imaging.Decode(reader)
 	if err != nil {
-		zap.L().Error("字节流转换为图片失败！错误信息为：" + err.Error())
+		zap.L().Error("字节流转换为图片失败！错误信息：" + err.Error())
+		return
 	}
 	err = imaging.Save(img, imagePath)
-	if err != nil {
-		zap.L().Error("保存图片失败！错误信息为：" + err.Error())
-	}
+	return
 }

@@ -1,33 +1,44 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 18:09:17
+ * @LastEditTime: 2023-01-25 15:45:43
  * @FilePath: /simple-DY/DY-api/video-web/config/config.go
  * @Description: 配置文件结构体
  */
 package config
 
 type Config struct {
-	MainServerAddress           string // 服务器ip地址
-	MainServerPort              string // 启动端口号
-	GRPCServerAddress           string // GRPC服务器地址
-	GRPCServerFeedPort          string // GRPC服务端口号
-	GRPCServerPublishActionPort string // GRPC服务端口号
-	GRPCServerPublishListPort   string // GRPC服务端口号
-	GRPCServerUserInfoPort      string // GRPC服务端口号
-	GRPCServerUserLoginPort     string // GRPC服务端口号
-	GRPCServerUserRegisterPort  string // GRPC服务端口号
-	MySQLAddress                string // MySQL服务器地址
-	MySQLPort                   string // MySQL端口号
-	MySQLUserName               string // MySQL用户名
-	MySQLPassword               string // MySQL密码
-	MySQLDataBase               string // MySQL数据库
-	NginxAddress                string // 静态资源服务器地址
-	NginxPort                   string // 静态资源服务器端口号
-	StaticPath                  string // 静态资源地址
-	VideoPath                   string // 视频存放地址
-	ImagePath                   string // 图片存放地址
-	JwtSecret                   string // jwt密钥
-	TimeString                  string // 时间格式化格式
-	TokenExpiresTime            int64  // token过期时间
+	MainServer MainServer // 主服务器
+	GRPC       GRPC       // GRPC相关
+}
+
+// 主服务器
+type MainServer struct {
+	Address string // 地址
+	Port    string // 端口
+}
+
+// GRPC相关
+type GRPC struct {
+	Address           string      // GRPC服务地址
+	FeedPort          string      // Feed服务端口号
+	PublishActionPort string      // PublishAction服务端口号
+	PublishListPort   string      // PublishList服务端口号
+	UserInfoPort      string      // UserInfo服务端口号
+	UserLoginPort     string      // UserLogin服务端口号
+	UserRegisterPort  string      // UserRegister服务端口号
+	GRPCMsgSize       GRPCMsgSize // GRPC消息传递大小限制
+	GRPCTimeOut       GRPCTimeOut // GRPC超时时间
+}
+
+// GRPC消息传递大小限制
+type GRPCMsgSize struct {
+	CommonMB int // 普通消息（4MB）
+	LargeMB  int // 文件字节流（32MB）
+}
+
+// GRPC超时时间
+type GRPCTimeOut struct {
+	CommonSecond int // 普通超时时间（1秒）
+	FileSecond   int // 文件超时时间（10秒）
 }

@@ -1,33 +1,85 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-22 18:08:57
+ * @LastEditTime: 2023-01-25 15:45:56
  * @FilePath: /simple-DY/DY-srvs/video-srv/config/config.go
  * @Description: 配置文件结构体
  */
 package config
 
 type Config struct {
-	MainServerAddress           string // 服务器ip地址
-	MainServerPort              string // 启动端口号
-	GRPCServerAddress           string // GRPC服务器地址
-	GRPCServerFeedPort          string // GRPC服务端口号
-	GRPCServerPublishActionPort string // GRPC服务端口号
-	GRPCServerPublishListPort   string // GRPC服务端口号
-	GRPCServerUserInfoPort      string // GRPC服务端口号
-	GRPCServerUserLoginPort     string // GRPC服务端口号
-	GRPCServerUserRegisterPort  string // GRPC服务端口号
-	MySQLAddress                string // MySQL服务器地址
-	MySQLPort                   string // MySQL端口号
-	MySQLUserName               string // MySQL用户名
-	MySQLPassword               string // MySQL密码
-	MySQLDataBase               string // MySQL数据库
-	NginxAddress                string // 静态资源服务器地址
-	NginxPort                   string // 静态资源服务器端口号
-	StaticPath                  string // 静态资源地址
-	VideoPath                   string // 视频存放地址
-	ImagePath                   string // 图片存放地址
-	JwtSecret                   string // jwt密钥
-	TimeString                  string // 时间格式化格式
-	TokenExpiresTime            int64  // token过期时间
+	GRPC         GRPC         // GRPC相关
+	MySQL        MySQL        // 数据库
+	OSS          OSS          // 静态资源存储
+	StaticBackup StaticBackup // 静态资源备份
+	JWT          JWT          // 鉴权
+	Time         Time         // 时间相关
+}
+
+// GRPC相关
+type GRPC struct {
+	Address           string      // GRPC服务地址
+	FeedPort          string      // Feed服务端口号
+	PublishActionPort string      // PublishAction服务端口号
+	PublishListPort   string      // PublishList服务端口号
+	UserInfoPort      string      // UserInfo服务端口号
+	UserLoginPort     string      // UserLogin服务端口号
+	UserRegisterPort  string      // UserRegister服务端口号
+	GRPCMsgSize       GRPCMsgSize // GRPC消息传递大小限制
+	GRPCTimeOut       GRPCTimeOut // GRPC超时时间
+}
+
+// GRPC消息传递大小限制
+type GRPCMsgSize struct {
+	CommonMB int // 普通消息（4MB）
+	LargeMB  int // 文件字节流（32MB）
+}
+
+// GRPC超时时间
+type GRPCTimeOut struct {
+	CommonSecond int // 普通超时时间（1秒）
+	FileSecond   int // 文件超时时间（10秒）
+}
+
+// 数据库
+type MySQL struct {
+	Address  string // MySQL地址
+	Port     string // MySQL端口
+	UserName string // MySQL用户名
+	Password string // MySQL密码
+	DataBase string // MySQL数据库
+
+}
+
+// 静态资源存储
+type OSS struct {
+	Address     string // 外链地址
+	VideoPath   string // 视频路径
+	VideoSuffix string // 视频后缀
+	ImagePath   string // 图片路径
+	ImageSuffix string // 图片后缀
+	AccessKey   string // AccessKey
+	SecretKey   string // SecretKey
+	Region      string // OSS地区
+	Bucket      string // Bucket
+}
+
+// 静态资源备份
+type StaticBackup struct {
+	StaticPath  string // 备份路径
+	VideoPath   string // 视频路径
+	VideoSuffix string // 视频后缀
+	ImagePath   string // 图片路径
+	ImageSuffix string // 图片后缀
+}
+
+// 鉴权
+type JWT struct {
+	Secret           string // JWT密钥
+	TokenExpiresTime int64  // Token失效时间（秒）
+}
+
+// 时间相关
+type Time struct {
+	TimeFormat string // 时间格式化的格式
 }

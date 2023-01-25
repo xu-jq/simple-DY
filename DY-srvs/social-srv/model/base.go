@@ -1,15 +1,23 @@
+/*
+ * @Date: 2023-01-19 11:21:47
+ * @LastEditors: zhang zhao
+ * @LastEditTime: 2023-01-25 15:18:43
+ * @FilePath: /simple-DY/DY-srvs/social-srv/model/base.go
+ * @Description:
+ */
 package model
 
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type GormList []string
 
-func (g GormList) Value() (driver.Value, error){
+func (g GormList) Value() (driver.Value, error) {
 	return json.Marshal(g)
 }
 
@@ -19,9 +27,9 @@ func (g *GormList) Scan(value interface{}) error {
 }
 
 type BaseModel struct {
-	ID int32 `gorm:"primarykey;type:int" json:"id"` //为什么使用int32， bigint
-	CreatedAt time.Time `gorm:"column:add_time" json:"-"`
-	UpdatedAt time.Time `gorm:"column:update_time" json:"-"`
+	ID        int32          `gorm:"primarykey;type:int" json:"id"` // 为什么使用int32， bigint
+	CreatedAt time.Time      `gorm:"column:add_time" json:"-"`
+	UpdatedAt time.Time      `gorm:"column:update_time" json:"-"`
 	DeletedAt gorm.DeletedAt `json:"-"`
-	IsDeleted bool `json:"-"`
+	IsDeleted bool           `json:"-"`
 }
