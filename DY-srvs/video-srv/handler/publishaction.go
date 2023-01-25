@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:17:01
+ * @LastEditTime: 2023-01-25 18:04:25
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishaction.go
  * @Description: PublishAction服务
  */
@@ -9,7 +9,6 @@ package handler
 
 import (
 	"context"
-	"log"
 	"net"
 	"os"
 	"simple-DY/DY-srvs/video-srv/global"
@@ -103,7 +102,7 @@ func (s *publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 		zap.L().Error("无法写入图片文件！错误信息：" + err.Error())
 		return &publishActionResponse, nil
 	}
-	zap.L().Info("图片文件备份成功！路径：" + videoStaticFileName)
+	zap.L().Info("图片文件备份成功！路径：" + imageStaticFileName)
 
 	videoOSSFileName := tokenId.Id + global.GlobalConfig.OSS.VideoPath + fileName + global.GlobalConfig.OSS.VideoSuffix
 	ImageOSSFileName := tokenId.Id + global.GlobalConfig.OSS.ImagePath + fileName + global.GlobalConfig.OSS.ImageSuffix
@@ -123,6 +122,10 @@ func (s *publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 		return &publishActionResponse, nil
 	}
 	zap.L().Info("图片文件上传成功！路径：" + ImageOSSFileName)
+
+	// 17M文件，13秒发送给请求给服务器，64秒处理完返回响应
+	// 31M文件，25秒发送给请求给服务器，121秒处理完返回响应
+	// 客户端在发送请求后开始计时，10秒钟内不能返回响应就报网络错误
 
 	authorId, _ := strconv.ParseInt(tokenId.Id, 10, 64)
 
@@ -153,7 +156,7 @@ func PublishActionService(port string) {
 	}
 	s := grpc.NewServer(grpc.MaxRecvMsgSize(1024*1024*global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB), grpc.MaxSendMsgSize(1024*1024*global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB))
 	pb.RegisterPublishActionServer(s, &publishactionserver{})
-	log.Printf("server listening at %v", lis.Addr())
+	zap.L().Info("服务器监听地址：" + lis.Addr().String())
 	if err := s.Serve(lis); err != nil {
 		zap.L().Error("无法提供服务！错误信息：" + err.Error())
 	}

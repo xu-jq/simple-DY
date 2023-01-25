@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:42:48
+ * @LastEditTime: 2023-01-25 23:17:35
  * @FilePath: /simple-DY/DY-api/video-web/api/userinfo.go
  * @Description: 1.3.1 用户信息
  */
@@ -23,10 +23,12 @@ import (
 // 1.3.1 用户信息
 
 func UserInfo(c *gin.Context) {
+
 	// 将接收的客户端请求参数绑定到结构体上
 	userId, err := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	if err != nil {
 		zap.L().Error("用户id转换为整数失败！错误信息：" + err.Error())
+		return
 	}
 	userRequest := models.UserRequest{
 		UserId: userId,
@@ -50,6 +52,7 @@ func UserInfo(c *gin.Context) {
 	})
 	if err != nil {
 		zap.L().Error("GRPC失败！错误信息：" + err.Error())
+		return
 	}
 
 	zap.L().Info("通过GRPC接收到的响应：" + responseUserInfo.String())

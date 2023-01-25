@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 18:39:07
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 14:09:01
+ * @LastEditTime: 2023-01-25 23:10:01
  * @FilePath: /simple-DY/db.sql
  * @Description: 数据库初始SQL操作
  */
@@ -16,10 +16,10 @@
 -- USE simpledy;
 
 
--- commen s definition
+-- comments definition
 
 DROP TABLE IF EXISTS `comments`;
-CREATE TABLE ` omments` (
+CREATE TABLE `comments` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评论id，自增主键',
   `user_id` bigint NOT NULL COMMENT '评论发布用户id',
   `video_id` bigint NOT NULL COMMENT '被评论视频的id',
@@ -33,7 +33,7 @@ CREATE TABLE ` omments` (
 -- follow  definition
 
 DROP TABLE IF EXISTS `follows`;
-CREATE TABLE `fo lows` (
+CREATE TABLE `follows` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `user_id` bigint NOT NULL COMMENT '用户id',
   `follower_id` bigint NOT NULL COMMENT '关注的用户',
@@ -43,7 +43,7 @@ CREATE TABLE `fo lows` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='关注表';
 
 
--- likes  efinition
+-- likes  definition
 
 DROP TABLE IF EXISTS `likes`;
 CREATE TABLE `likes` (
@@ -57,10 +57,10 @@ CREATE TABLE `likes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='点赞表';
 
 
--- messag s definition
+-- messages definition
 
 DROP TABLE IF EXISTS `messages`;
-CREATE TABLE ` essages` (
+CREATE TABLE `messages` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `user_id` bigint NOT NULL COMMENT '发送消息的用户id',
   `to_user_id` bigint NOT NULL COMMENT '接收消息的用户id',
@@ -72,7 +72,7 @@ CREATE TABLE ` essages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='消息表';
 
 
--- users  efinition
+-- users  definition
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (

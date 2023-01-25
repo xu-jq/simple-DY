@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:17:28
+ * @LastEditTime: 2023-01-25 23:18:18
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userinfo.go
  * @Description: UserInfo服务
  */

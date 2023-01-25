@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-22 17:38:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:18:16
+ * @LastEditTime: 2023-01-25 22:27:24
  * @FilePath: /simple-DY/DY-srvs/video-srv/utils/jwt/token.go
  * @Description: 调用jwt产生Token
  */
@@ -17,7 +17,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// 根据注册或者登录的id和用户名产生token
+// 根据注册或者登录的id产生token
 func GenerateToken(id int64) string {
 	zap.L().Info("开始产生Token...")
 

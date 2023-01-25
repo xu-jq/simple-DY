@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:44:57
+ * @LastEditTime: 2023-01-25 22:18:28
  * @FilePath: /simple-DY/DY-api/video-web/api/userlogin.go
  * @Description: 1.3.3 用户登录
  */
@@ -45,6 +45,7 @@ func UserLogin(c *gin.Context) {
 	})
 	if err != nil {
 		zap.L().Error("GRPC失败！错误信息：" + err.Error())
+		return
 	}
 
 	zap.L().Info("通过GRPC接收到的响应：" + responseUserLogin.String())

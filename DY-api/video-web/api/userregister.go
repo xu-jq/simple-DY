@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:45:02
+ * @LastEditTime: 2023-01-25 22:18:43
  * @FilePath: /simple-DY/DY-api/video-web/api/userregister.go
  * @Description: 1.3.2 用户注册
  */
@@ -45,6 +45,7 @@ func UserRegister(c *gin.Context) {
 	})
 	if err != nil {
 		zap.L().Error("GRPC失败！错误信息：" + err.Error())
+		return
 	}
 
 	zap.L().Info("通过GRPC接收到的响应：" + responseUserRegister.String())
