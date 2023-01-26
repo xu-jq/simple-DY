@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 23:17:35
+ * @LastEditTime: 2023-01-26 11:10:35
  * @FilePath: /simple-DY/DY-api/video-web/api/userinfo.go
  * @Description: 1.3.1 用户信息
  */
@@ -66,8 +66,8 @@ func UserInfo(c *gin.Context) {
 		User: models.User{
 			Id:            responseUserInfo.User.GetId(),
 			Name:          responseUserInfo.User.GetName(),
-			FollowCount:   0,
-			FollowerCount: 0,
+			FollowCount:   responseUserInfo.User.GetFollowCount(),
+			FollowerCount: responseUserInfo.User.GetFollowerCount(),
 			IsFollow:      false,
 		},
 	}

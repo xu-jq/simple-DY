@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-25 21:11:11
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 21:52:48
+ * @LastEditTime: 2023-01-26 10:25:20
  * @FilePath: /simple-DY/DY-srvs/video-srv/utils/dao/userdao.go
  * @Description: 对users数据表的操作
  */
@@ -24,6 +24,21 @@ func GetUserByName(name string) models.Users {
 
 	// 根据姓名查找数据库中的用户信息
 	global.DB.Where("name = ?", name).Find(&user)
+
+	return user
+}
+
+/**
+ * @description: 通过id获取Users表的信息,由于id一定是唯一的，因此只有查找到和没有查找到两种情况，不会出现查询出多个的情况
+ * @param {int64} id
+ * @return {models.Users} user
+ */
+func GetUserById(id int64) models.Users {
+	// 数据库查询和更新的模板
+	user := models.Users{}
+
+	// 根据id查找数据库中的用户信息
+	global.DB.Where("id = ?", id).Find(&user)
 
 	return user
 }

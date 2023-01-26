@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:17:24
+ * @LastEditTime: 2023-01-26 10:58:17
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishlist.go
  * @Description: PublishAction服务
  */
@@ -9,7 +9,6 @@ package handler
 
 import (
 	"context"
-	"log"
 	"net"
 	"simple-DY/DY-srvs/video-srv/global"
 	"simple-DY/DY-srvs/video-srv/models"
@@ -106,7 +105,7 @@ func PublishListService(port string) {
 	}
 	s := grpc.NewServer()
 	pb.RegisterPublishListServer(s, &publishlistserver{})
-	log.Printf("server listening at %v", lis.Addr())
+	zap.L().Info("服务器监听地址：" + lis.Addr().String())
 	if err := s.Serve(lis); err != nil {
 		zap.L().Error("无法提供服务！错误信息：" + err.Error())
 	}
