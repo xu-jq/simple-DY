@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 11:10:30
+ * @LastEditTime: 2023-01-26 16:13:38
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userinfo.go
  * @Description: UserInfo服务
  */
@@ -13,7 +13,6 @@ import (
 	"simple-DY/DY-srvs/video-srv/global"
 	pb "simple-DY/DY-srvs/video-srv/proto"
 	"simple-DY/DY-srvs/video-srv/utils/dao"
-	"simple-DY/DY-srvs/video-srv/utils/jwt"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -28,36 +27,22 @@ func (s *userinfoserver) UserInfo(ctx context.Context, in *pb.DouyinUserRequest)
 	// 构建返回的响应
 	userResponse := pb.DouyinUserResponse{}
 
-	// 将token解析并与id作比较
-	statuscode := jwt.GetAndJudgeIdByToken(in.Token, in.UserId)
-
-	userResponse.StatusCode = statuscode
-
-	if statuscode != 0 {
-		if statuscode == 4 {
-			userResponse.StatusMsg = "没有携带Token信息！"
-		} else if statuscode == 5 {
-			userResponse.StatusMsg = "Token不正确！"
-		}
-		return &userResponse, nil
-	}
-
-	// Todo：并行处理三个查询
-
 	// 通过id获取Users表的信息
 	user := dao.GetUserById(in.UserId)
-	// 查询关注总数
-	followcount := dao.CountFollow(in.UserId)
-	// 查询粉丝总数
-	followercount := dao.CountFollower(in.UserId)
+
+	// 如果这个用户不存在，则不能返回信息
+	if user.Name == "" {
+		zap.L().Error("用户不存在！")
+		userResponse.StatusCode = 2
+		userResponse.StatusMsg = "用户不存在！"
+		return &userResponse, nil
+	}
 
 	// 返回响应
 	userResponse.StatusMsg = "成功获取用户信息"
 	userResponse.User = &pb.User{
-		Id:            user.Id,
-		Name:          user.Name,
-		FollowCount:   followcount,
-		FollowerCount: followercount,
+		Id:   user.Id,
+		Name: user.Name,
 	}
 	zap.L().Info("成功获取用户信息！")
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 10:58:21
+ * @LastEditTime: 2023-01-26 17:38:56
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userlogin.go
  * @Description: UserLogin服务
  */
@@ -36,7 +36,7 @@ func (s *userloginserver) UserLogin(ctx context.Context, in *pb.DouyinUserLoginR
 	if user.Id == 0 {
 		userLoginResponse.StatusCode = 2
 		userLoginResponse.StatusMsg = "用户不存在！"
-		zap.L().Error("用户不存在！无法登录！用户名称：" + user.Name)
+		zap.L().Error("用户不存在！无法登录！用户名称：" + in.Username)
 		return &userLoginResponse, nil
 	}
 

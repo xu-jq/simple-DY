@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-22 17:38:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 10:55:45
+ * @LastEditTime: 2023-01-26 16:41:10
  * @FilePath: /simple-DY/DY-srvs/video-srv/utils/jwt/token.go
  * @Description: 调用jwt产生Token
  */
@@ -11,7 +11,6 @@ package jwt
 import (
 	"simple-DY/DY-srvs/video-srv/global"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -73,24 +72,24 @@ func ParseToken(token string) (*jwt.StandardClaims, error) {
 	return nil, err
 }
 
-/**
- * @description: 解析Token，并与接收到的用户id作比较，如果一致则返回0
- * @param {string} token
- * @param {int64} userId
- * @return {int} StatusCode
- */
-func GetAndJudgeIdByToken(token string, userId int64) int32 {
-	// 没有携带Token信息
-	if len(token) == 0 {
-		zap.L().Error("没有携带Token信息！无法获取用户信息！")
-		return 4
-	}
+// /**
+//  * @description: 解析Token，并与接收到的用户id作比较，如果一致则返回0
+//  * @param {string} token
+//  * @param {int64} userId
+//  * @return {int} StatusCode
+//  */
+// func GetAndJudgeIdByToken(token string, userId int64) int32 {
+// 	// 没有携带Token信息
+// 	if len(token) == 0 {
+// 		zap.L().Error("没有携带Token信息！无法获取用户信息！")
+// 		return 4
+// 	}
 
-	// 从Token中读取携带的id信息
-	tokenId, err := ParseToken(strings.Fields(token)[1])
-	if err != nil || tokenId.Id != strconv.FormatInt(userId, 10) {
-		zap.L().Error("Token不正确！无法获取用户信息！")
-		return 5
-	}
-	return 0
-}
+// 	// 从Token中读取携带的id信息
+// 	tokenId, err := ParseToken(strings.Fields(token)[1])
+// 	if err != nil || tokenId.Id != strconv.FormatInt(userId, 10) {
+// 		zap.L().Error("Token不正确！无法获取用户信息！")
+// 		return 5
+// 	}
+// 	return 0
+// }

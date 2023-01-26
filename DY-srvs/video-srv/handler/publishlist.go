@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 10:58:17
+ * @LastEditTime: 2023-01-26 16:23:20
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishlist.go
  * @Description: PublishAction服务
  */
@@ -11,11 +11,9 @@ import (
 	"context"
 	"net"
 	"simple-DY/DY-srvs/video-srv/global"
-	"simple-DY/DY-srvs/video-srv/models"
 	pb "simple-DY/DY-srvs/video-srv/proto"
-	"simple-DY/DY-srvs/video-srv/utils/jwt"
+	"simple-DY/DY-srvs/video-srv/utils/dao"
 	"strconv"
-	"strings"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -30,28 +28,8 @@ func (s *publishlistserver) PublishList(ctx context.Context, in *pb.DouyinPublis
 	// 构建返回的响应
 	publishListResponse := pb.DouyinPublishListResponse{}
 
-	// 没有携带Token信息
-	if len(in.Token) == 0 {
-		publishListResponse.StatusCode = -1
-		publishListResponse.StatusMsg = "没有携带Token信息！"
-		zap.L().Error("没有携带Token信息！无法获取用户投稿的视频！")
-		return &publishListResponse, nil
-	}
-
-	// 从Token中读取携带的id信息
-	tokenId, err := jwt.ParseToken(strings.Fields(in.Token)[1])
-	if err != nil || tokenId.Id != strconv.FormatInt(in.UserId, 10) {
-		publishListResponse.StatusCode = 1
-		publishListResponse.StatusMsg = "Token不正确！"
-		zap.L().Error("Token不正确！无法获取用户投稿的视频！")
-		return &publishListResponse, nil
-	}
-
-	// 数据库查询和更新的模板
-	user := models.Users{}
-
-	// 根据姓名查找数据库中的用户信息
-	global.DB.Select("name").Where("id = ?", in.UserId).Find(&user)
+	// 根据id查找数据库中的用户信息
+	user := dao.GetUserById(in.UserId)
 
 	// 如果这个用户不存在，则不能返回信息
 	if user.Name == "" {
@@ -61,11 +39,8 @@ func (s *publishlistserver) PublishList(ctx context.Context, in *pb.DouyinPublis
 		return &publishListResponse, nil
 	}
 
-	result := []map[string]interface{}{}
-
-	// 查询作者的视频
-	global.DB.Model(&models.Videos{}).Where("author_id = " + strconv.FormatInt(in.UserId, 10)).Order("publish_time DESC").Find(&result)
-
+	// 查询作者视频
+	result := dao.GetAuthorVideos(in.UserId)
 	zap.L().Info("作者投稿视频查询完成！")
 
 	videolistLen := len(result)
@@ -91,8 +66,6 @@ func (s *publishlistserver) PublishList(ctx context.Context, in *pb.DouyinPublis
 			Title:    result[idx]["title"].(string),
 		}
 	}
-
-	zap.L().Info("返回响应成功！")
 
 	return &publishListResponse, nil
 }
