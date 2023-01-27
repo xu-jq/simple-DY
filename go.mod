@@ -15,6 +15,7 @@ require (
 	github.com/qiniu/go-sdk/v7 v7.14.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.14.0
+	github.com/streadway/amqp v1.0.0
 	github.com/u2takey/ffmpeg-go v0.4.1
 	go.uber.org/zap v1.24.0
 	google.golang.org/grpc v1.52.0

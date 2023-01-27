@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 14:58:33
+ * @LastEditTime: 2023-01-27 10:32:40
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishaction.go
  * @Description: PublishAction服务
  */
@@ -17,7 +17,7 @@ import (
 	"simple-DY/DY-srvs/video-srv/utils/dao"
 	"simple-DY/DY-srvs/video-srv/utils/ffmpeg"
 	"simple-DY/DY-srvs/video-srv/utils/jwt"
-	"simple-DY/DY-srvs/video-srv/utils/oss"
+	"simple-DY/DY-srvs/video-srv/utils/rabbitmq"
 	"strconv"
 	"strings"
 	"time"
@@ -68,7 +68,7 @@ func (s *publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 		publishActionResponse.StatusMsg = "备份文件夹操作失败！"
 		return &publishActionResponse, nil
 	}
-	zap.L().Info("备份文件夹操作成功！错误信息：")
+	zap.L().Info("备份文件夹操作成功！")
 
 	// 将字节流写入视频文件
 	err = os.WriteFile(videoStaticFileName, []byte(in.Data), 0666)
@@ -91,34 +91,29 @@ func (s *publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 	zap.L().Info("图片文件备份成功！路径：" + imageStaticFileName)
 
 	videoOSSFileName := tokenId.Id + global.GlobalConfig.OSS.VideoPath + fileName + global.GlobalConfig.OSS.VideoSuffix
-	ImageOSSFileName := tokenId.Id + global.GlobalConfig.OSS.ImagePath + fileName + global.GlobalConfig.OSS.ImageSuffix
+	imageOSSFileName := tokenId.Id + global.GlobalConfig.OSS.ImagePath + fileName + global.GlobalConfig.OSS.ImageSuffix
 
-	// 上传视频文件
-	err = oss.UploadFileToQiniuOSS(videoStaticFileName, videoOSSFileName)
+	// 构建传递给消息队列的消息结构体
+	err = rabbitmq.PublishSimple(rabbitmq.Message{
+		VideoStaticFileName: videoStaticFileName,
+		VideoOSSFileName:    videoOSSFileName,
+		ImageStaticFileName: imageStaticFileName,
+		ImageOSSFileName:    imageOSSFileName,
+		AuthorId:            authorId,
+		FileName:            fileName,
+		Time:                time.Now().Unix(),
+		Title:               in.Title,
+	})
 	if err != nil {
-		zap.L().Error("无法上传视频文件！错误信息：" + err.Error())
+		zap.L().Error("无法上传视频或图片文件！错误信息：" + err.Error())
 		publishActionResponse.StatusCode = 9
-		publishActionResponse.StatusMsg = "无法上传视频文件！"
+		publishActionResponse.StatusMsg = "无法上传文件！"
 		return &publishActionResponse, nil
 	}
-	zap.L().Info("视频文件上传成功！路径：" + videoOSSFileName)
-
-	// 上传图片文件
-	err = oss.UploadFileToQiniuOSS(imageStaticFileName, ImageOSSFileName)
-	if err != nil {
-		zap.L().Error("无法上传图片文件！错误信息：" + err.Error())
-		publishActionResponse.StatusCode = 10
-		publishActionResponse.StatusMsg = "无法上传图片文件！"
-		return &publishActionResponse, nil
-	}
-	zap.L().Info("图片文件上传成功！路径：" + ImageOSSFileName)
 
 	// 17M文件，13秒发送给请求给服务器，64秒处理完返回响应
 	// 31M文件，25秒发送给请求给服务器，121秒处理完返回响应
 	// 客户端在发送请求后开始计时，10秒钟内不能返回响应就报网络错误
-
-	// 向数据库中插入数据
-	dao.InsertVideo(authorId, fileName, time.Now().Unix(), in.Title)
 
 	publishActionResponse = pb.DouyinPublishActionResponse{
 		StatusCode: 0,

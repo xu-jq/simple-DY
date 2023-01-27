@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:45:56
+ * @LastEditTime: 2023-01-27 09:59:04
  * @FilePath: /simple-DY/DY-srvs/video-srv/config/config.go
  * @Description: 配置文件结构体
  */
@@ -14,6 +14,7 @@ type Config struct {
 	StaticBackup StaticBackup // 静态资源备份
 	JWT          JWT          // 鉴权
 	Time         Time         // 时间相关
+	RabbitMQ     RabbitMQ     // 消息队列
 }
 
 // GRPC相关
@@ -82,4 +83,13 @@ type JWT struct {
 // 时间相关
 type Time struct {
 	TimeFormat string // 时间格式化的格式
+}
+
+// 消息队列
+type RabbitMQ struct {
+	Address     string // RabbitMQ地址
+	Port        string // RabbitMQ端口
+	UserName    string // RabbitMQ用户名
+	Password    string // RabbitMQ密码
+	VirtualHost string // RabbitMQ VirtualHost
 }
