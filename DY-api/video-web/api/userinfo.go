@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 17:15:28
+ * @LastEditTime: 2023-01-28 22:41:14
  * @FilePath: /simple-DY/DY-api/video-web/api/userinfo.go
  * @Description: 1.3.1 用户信息
  */
@@ -67,18 +67,18 @@ func douyinUser(user_id string) (responseUserInfo *pb.DouyinUserResponse, err er
 		UserId: userId,
 	}
 
-	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPC.UserInfoPort)
-	defer conn.Close()
+	// // 与服务器建立GRPC连接
+	// conn := InitGRPC(global.GlobalConfig.GRPC.UserInfoPort)
+	// defer conn.Close()
 
-	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.UserInfoPort)
+	// zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.UserInfoPort)
 
-	cpb := pb.NewUserInfoClient(conn)
+	// cpb := pb.NewUserInfoClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
-	responseUserInfo, err = cpb.UserInfo(ctx, &pb.DouyinUserRequest{
+	responseUserInfo, err = global.UserInfoSrvClient.UserInfo(ctx, &pb.DouyinUserRequest{
 		UserId: userRequest.UserId,
 	})
 	zap.L().Info("通过GRPC接收到的响应：" + responseUserInfo.String())

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:14:34
+ * @LastEditTime: 2023-01-28 22:40:11
  * @FilePath: /simple-DY/DY-api/video-web/main.go
  * @Description: 主程序
  */
@@ -43,6 +43,9 @@ func main() {
 		return
 	}
 	zap.L().Info("GRPC翻译器初始化成功！")
+
+	// 初始化GRPC连接
+	initialize.InitSrvConn()
 
 	// 运行主程序
 	r.Run(":" + global.GlobalConfig.MainServer.Port)

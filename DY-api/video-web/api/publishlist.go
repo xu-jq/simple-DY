@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 17:14:57
+ * @LastEditTime: 2023-01-28 22:41:05
  * @FilePath: /simple-DY/DY-api/video-web/api/publishlist.go
  * @Description: 1.2.1 视频发布列表
  */
@@ -85,18 +85,18 @@ func douyinPublishList(user_id string) (responsePublishList *pb.DouyinPublishLis
 		UserId: userId,
 	}
 
-	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPC.PublishListPort)
-	defer conn.Close()
+	// // 与服务器建立GRPC连接
+	// conn := InitGRPC(global.GlobalConfig.GRPC.PublishListPort)
+	// defer conn.Close()
 
-	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.PublishListPort)
+	// zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.PublishListPort)
 
-	cpb := pb.NewPublishListClient(conn)
+	// cpb := pb.NewPublishListClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
-	responsePublishList, err = cpb.PublishList(ctx, &pb.DouyinPublishListRequest{
+	responsePublishList, err = global.PublishListSrvClient.PublishList(ctx, &pb.DouyinPublishListRequest{
 		UserId: publishListRequest.UserId,
 	})
 	zap.L().Info("通过GRPC接收到的响应：" + responsePublishList.String())

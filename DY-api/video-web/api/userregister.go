@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 22:18:43
+ * @LastEditTime: 2023-01-28 22:42:03
  * @FilePath: /simple-DY/DY-api/video-web/api/userregister.go
  * @Description: 1.3.2 用户注册
  */
@@ -27,19 +27,19 @@ func UserRegister(c *gin.Context) {
 		Password: c.Query("password"),
 	}
 
-	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPC.UserRegisterPort)
-	defer conn.Close()
+	// // 与服务器建立GRPC连接
+	// conn := InitGRPC(global.GlobalConfig.GRPC.UserRegisterPort)
+	// defer conn.Close()
 
-	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.UserRegisterPort)
+	// zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.UserRegisterPort)
 
-	cpb := pb.NewUserRegisterClient(conn)
+	// cpb := pb.NewUserRegisterClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
 
-	responseUserRegister, err := cpb.UserRegister(ctx, &pb.DouyinUserRegisterRequest{
+	responseUserRegister, err := global.UserRegisterSrvClient.UserRegister(ctx, &pb.DouyinUserRegisterRequest{
 		Username: userRegisterRequest.UserName,
 		Password: userRegisterRequest.Password,
 	})

@@ -1,3 +1,10 @@
+/*
+ * @Date: 2023-01-28 20:53:39
+ * @LastEditors: zhang zhao
+ * @LastEditTime: 2023-01-28 21:01:39
+ * @FilePath: /simple-DY/DY-api/social-web/router/relation.go
+ * @Description:
+ */
 /**
 * @Author Wang Hui
 * @Description
@@ -6,8 +13,9 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"simple-DY/DY-api/social-web/api"
+
+	"github.com/gin-gonic/gin"
 )
 
 func InitRelationRouter(Router *gin.RouterGroup) {

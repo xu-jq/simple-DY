@@ -12,8 +12,8 @@ require (
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/hashicorp/consul/api v1.18.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/qiniu/go-sdk/v7 v7.14.0
 	github.com/mbobakov/grpc-consul-resolver v1.4.4
+	github.com/qiniu/go-sdk/v7 v7.14.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.14.0
 	github.com/streadway/amqp v1.0.0

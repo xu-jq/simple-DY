@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 15:44:35
+ * @LastEditTime: 2023-01-28 22:40:44
  * @FilePath: /simple-DY/DY-api/video-web/api/publishaction.go
  * @Description: 1.2.2 投稿接口
  */
@@ -35,19 +35,19 @@ func PublishAction(c *gin.Context) {
 		Title: c.PostForm("title"),
 	}
 
-	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPC.PublishActionPort)
-	defer conn.Close()
+	// // 与服务器建立GRPC连接
+	// conn := InitGRPC(global.GlobalConfig.GRPC.PublishActionPort)
+	// defer conn.Close()
 
-	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.PublishActionPort)
+	// zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.PublishActionPort)
 
-	cpb := pb.NewPublishActionClient(conn)
+	// cpb := pb.NewPublishActionClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.FileSecond))
 	defer cancel()
 
-	responsePublishAction, err := cpb.PublishAction(ctx, &pb.DouyinPublishActionRequest{
+	responsePublishAction, err := global.PublishActionSrvClient.PublishAction(ctx, &pb.DouyinPublishActionRequest{
 		Data:  publishActionRequest.Data,
 		Token: publishActionRequest.Token,
 		Title: publishActionRequest.Title,

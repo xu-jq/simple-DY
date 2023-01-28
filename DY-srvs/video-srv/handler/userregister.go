@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 10:58:24
+ * @LastEditTime: 2023-01-28 23:21:32
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userregister.go
  * @Description: UserRegister服务
  */
@@ -12,12 +12,15 @@ import (
 	"net"
 	"simple-DY/DY-srvs/video-srv/global"
 	pb "simple-DY/DY-srvs/video-srv/proto"
+	"simple-DY/DY-srvs/video-srv/utils/consul"
 	"simple-DY/DY-srvs/video-srv/utils/dao"
 	"simple-DY/DY-srvs/video-srv/utils/jwt"
 	"simple-DY/DY-srvs/video-srv/utils/md5salt"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type userregisterserver struct {
@@ -59,13 +62,22 @@ func (s *userregisterserver) UserRegister(ctx context.Context, in *pb.DouyinUser
 
 func UserRegisterService(port string) {
 	defer global.Wg.Done()
-	lis, err := net.Listen("tcp", ":"+port)
+
+	s := grpc.NewServer()
+	pb.RegisterUserRegisterServer(s, &userregisterserver{})
+	lis, err := net.Listen("tcp", "localhost:"+port)
 	if err != nil {
 		zap.L().Error("无法监听客户端！错误信息：" + err.Error())
 	}
-	s := grpc.NewServer()
-	pb.RegisterUserRegisterServer(s, &userregisterserver{})
 	zap.L().Info("服务器监听地址：" + lis.Addr().String())
+
+	//注册服务健康检查
+	grpc_health_v1.RegisterHealthServer(s, health.NewServer())
+
+	//服务注册
+	register_client := consul.NewRegistryClient(global.GlobalConfig.Consul.Address, global.GlobalConfig.Consul.Port)
+	register_client.Register("localhost", port, "UserRegister", "UserRegister")
+
 	if err := s.Serve(lis); err != nil {
 		zap.L().Error("无法提供服务！错误信息：" + err.Error())
 	}

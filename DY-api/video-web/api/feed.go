@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 14:08:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 17:55:06
+ * @LastEditTime: 2023-01-28 21:27:06
  * @FilePath: /simple-DY/DY-api/video-web/api/feed.go
  * @Description: 1.1 视频流接口
  */
@@ -93,18 +93,18 @@ func douyinFeed(latest_time string) (responseFeed *pb.DouyinFeedResponse, err er
 		LatestTime: latestTime,
 	}
 
-	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPC.FeedPort)
-	defer conn.Close()
+	// // 与服务器建立GRPC连接
+	// conn := InitGRPC(global.GlobalConfig.GRPC.FeedPort)
+	// defer conn.Close()
 
-	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.FeedPort)
+	// zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.FeedPort)
 
-	cpb := pb.NewFeedClient(conn)
+	// cpb := pb.NewFeedClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
-	responseFeed, err = cpb.Feed(ctx, &pb.DouyinFeedRequest{
+	responseFeed, err = global.FeedSrvClient.Feed(ctx, &pb.DouyinFeedRequest{
 		LatestTime: feedRequest.LatestTime,
 	})
 

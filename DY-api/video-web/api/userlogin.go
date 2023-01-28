@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 22:18:28
+ * @LastEditTime: 2023-01-28 22:41:44
  * @FilePath: /simple-DY/DY-api/video-web/api/userlogin.go
  * @Description: 1.3.3 用户登录
  */
@@ -27,19 +27,19 @@ func UserLogin(c *gin.Context) {
 		Password: c.Query("password"),
 	}
 
-	// 与服务器建立GRPC连接
-	conn := InitGRPC(global.GlobalConfig.GRPC.UserLoginPort)
-	defer conn.Close()
+	// // 与服务器建立GRPC连接
+	// conn := InitGRPC(global.GlobalConfig.GRPC.UserLoginPort)
+	// defer conn.Close()
 
-	zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.UserLoginPort)
+	// zap.L().Info("服务器端口：" + global.GlobalConfig.GRPC.UserLoginPort)
 
-	cpb := pb.NewUserLoginClient(conn)
+	// cpb := pb.NewUserLoginClient(conn)
 
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
 
-	responseUserLogin, err := cpb.UserLogin(ctx, &pb.DouyinUserLoginRequest{
+	responseUserLogin, err := global.UserLoginSrvClient.UserLogin(ctx, &pb.DouyinUserLoginRequest{
 		Username: userLoginRequest.UserName,
 		Password: userLoginRequest.Password,
 	})

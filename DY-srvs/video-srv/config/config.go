@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-27 09:59:04
+ * @LastEditTime: 2023-01-28 22:46:20
  * @FilePath: /simple-DY/DY-srvs/video-srv/config/config.go
  * @Description: 配置文件结构体
  */
@@ -15,6 +15,7 @@ type Config struct {
 	JWT          JWT          // 鉴权
 	Time         Time         // 时间相关
 	RabbitMQ     RabbitMQ     // 消息队列
+	Consul       Consul       // Consul
 }
 
 // GRPC相关
@@ -92,4 +93,10 @@ type RabbitMQ struct {
 	UserName    string // RabbitMQ用户名
 	Password    string // RabbitMQ密码
 	VirtualHost string // RabbitMQ VirtualHost
+}
+
+// Consul
+type Consul struct {
+	Address string // 地址
+	Port    string // 端口
 }

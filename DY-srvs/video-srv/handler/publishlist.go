@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 16:23:20
+ * @LastEditTime: 2023-01-28 23:20:40
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishlist.go
  * @Description: PublishAction服务
  */
@@ -12,11 +12,14 @@ import (
 	"net"
 	"simple-DY/DY-srvs/video-srv/global"
 	pb "simple-DY/DY-srvs/video-srv/proto"
+	"simple-DY/DY-srvs/video-srv/utils/consul"
 	"simple-DY/DY-srvs/video-srv/utils/dao"
 	"strconv"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type publishlistserver struct {
@@ -72,13 +75,22 @@ func (s *publishlistserver) PublishList(ctx context.Context, in *pb.DouyinPublis
 
 func PublishListService(port string) {
 	defer global.Wg.Done()
-	lis, err := net.Listen("tcp", ":"+port)
+
+	s := grpc.NewServer()
+	pb.RegisterPublishListServer(s, &publishlistserver{})
+	lis, err := net.Listen("tcp", "localhost:"+port)
 	if err != nil {
 		zap.L().Error("无法监听客户端！错误信息：" + err.Error())
 	}
-	s := grpc.NewServer()
-	pb.RegisterPublishListServer(s, &publishlistserver{})
 	zap.L().Info("服务器监听地址：" + lis.Addr().String())
+
+	//注册服务健康检查
+	grpc_health_v1.RegisterHealthServer(s, health.NewServer())
+
+	//服务注册
+	register_client := consul.NewRegistryClient(global.GlobalConfig.Consul.Address, global.GlobalConfig.Consul.Port)
+	register_client.Register("localhost", port, "PublishList", "PublishList")
+
 	if err := s.Serve(lis); err != nil {
 		zap.L().Error("无法提供服务！错误信息：" + err.Error())
 	}
