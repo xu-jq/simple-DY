@@ -1,3 +1,4 @@
+// Package initialize /**
 package initialize
 
 import (
@@ -5,7 +6,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"simple-DY/DY-srvs/social-srv/global"
+	"simple-DY/DY-api/social-web/global"
 )
 
 // GetEnvInfo 获取当前系统变量
@@ -36,7 +37,6 @@ func InitCfg() {
 	if err := v.Unmarshal(&global.ServerConfig); err != nil {
 		panic(err)
 	}
-
 	zap.S().Infof("配置信息：%v", global.ServerConfig)
 
 	// 3.viper动态监控配置文件变化

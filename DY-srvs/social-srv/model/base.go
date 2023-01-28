@@ -21,7 +21,7 @@ func (g GormList) Value() (driver.Value, error) {
 	return json.Marshal(g)
 }
 
-// 实现 sql.Scanner 接口，Scan 将 value 扫描至 Jsonb
+// Scan 实现 sql.Scanner 接口，Scan 将 value 扫描至 Jsonb
 func (g *GormList) Scan(value interface{}) error {
 	return json.Unmarshal(value.([]byte), &g)
 }
@@ -32,4 +32,10 @@ type BaseModel struct {
 	UpdatedAt time.Time      `gorm:"column:update_time" json:"-"`
 	DeletedAt gorm.DeletedAt `json:"-"`
 	IsDeleted bool           `json:"-"`
+}
+
+type Follows struct {
+	ID         int64 `gorm:"primarykey;type:int" json:"id"`
+	UserID     int64 `gorm:"column:user_id" json:"UserID"`
+	FollowerID int64 `gorm:"column:follower_id" json:"FollowerID"`
 }

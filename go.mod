@@ -13,6 +13,7 @@ require (
 	github.com/hashicorp/consul/api v1.18.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/qiniu/go-sdk/v7 v7.14.0
+	github.com/mbobakov/grpc-consul-resolver v1.4.4
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.14.0
 	github.com/streadway/amqp v1.0.0
@@ -29,6 +30,7 @@ require (
 	github.com/aws/aws-sdk-go v1.38.20 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/go-playground/form v3.1.4+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -43,6 +45,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jonboulle/clockwork v0.3.0 // indirect
+	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/strftime v1.0.6 // indirect

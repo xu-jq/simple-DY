@@ -1,0 +1,12 @@
+name: 'social-srv'
+mysql:
+  host: '124.221.120.88'
+  port: 3306
+  db: 'tiktock'
+  user: 'root'
+  password: ''
+
+consul:
+  host: '192.168.123.150'
+  #host: '124.221.120.88'
+  port: 8500
