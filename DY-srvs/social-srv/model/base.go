@@ -39,3 +39,11 @@ type Follows struct {
 	UserID     int64 `gorm:"column:user_id" json:"UserID"`
 	FollowerID int64 `gorm:"column:follower_id" json:"FollowerID"`
 }
+
+type Message struct {
+	ID       int64     `gorm:"primarykey;type:int" json:"id"`
+	UserID   int64     `gorm:"column:user_id" json:"user_id"`
+	ToUserID int64     `gorm:"column:to_user_id" json:"to_user_id"`
+	SentTime time.Time `gorm:"column:sent_time" json:"sent_time"`
+	Content  string    `gorm:"column:content" json:"content"`
+}

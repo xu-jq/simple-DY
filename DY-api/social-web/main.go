@@ -23,6 +23,11 @@ func main() {
 	// 初始化微服务连接
 	initialize.InitSrvConn()
 
+	// 初始化翻译
+	if err := initialize.InitTrans("zh"); err != nil {
+		panic(err)
+	}
+
 	// 2. 服务注册
 	registerClient := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, global.ServerConfig.ConsulInfo.Port)
 	serviceId := fmt.Sprintf("%s", uuid.NewV4())
