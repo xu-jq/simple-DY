@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-25 13:28:49
+ * @LastEditTime: 2023-01-29 09:53:24
  * @FilePath: /simple-DY/DY-srvs/video-srv/global/global.go
  * @Description: 全局变量
  */

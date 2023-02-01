@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 23:20:12
+ * @LastEditTime: 2023-01-29 09:55:20
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishaction.go
  * @Description: PublishAction服务
  */
@@ -9,12 +9,10 @@ package handler
 
 import (
 	"context"
-	"net"
 	"os"
 	"simple-DY/DY-srvs/video-srv/global"
 	pb "simple-DY/DY-srvs/video-srv/proto"
 	"simple-DY/DY-srvs/video-srv/utils/backup"
-	"simple-DY/DY-srvs/video-srv/utils/consul"
 	"simple-DY/DY-srvs/video-srv/utils/dao"
 	"simple-DY/DY-srvs/video-srv/utils/ffmpeg"
 	"simple-DY/DY-srvs/video-srv/utils/jwt"
@@ -24,16 +22,13 @@ import (
 	"time"
 
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/health"
-	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
-type publishactionserver struct {
+type Publishactionserver struct {
 	pb.UnimplementedPublishActionServer
 }
 
-func (s *publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPublishActionRequest) (*pb.DouyinPublishActionResponse, error) {
+func (s *Publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPublishActionRequest) (*pb.DouyinPublishActionResponse, error) {
 
 	// 构建返回的响应
 	publishActionResponse := pb.DouyinPublishActionResponse{}
@@ -124,27 +119,4 @@ func (s *publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 	}
 
 	return &publishActionResponse, nil
-}
-
-func PublishActionService(port string) {
-	defer global.Wg.Done()
-
-	s := grpc.NewServer(grpc.MaxRecvMsgSize(1024*1024*global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB), grpc.MaxSendMsgSize(1024*1024*global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB))
-	pb.RegisterPublishActionServer(s, &publishactionserver{})
-	lis, err := net.Listen("tcp", "localhost:"+port)
-	if err != nil {
-		zap.L().Error("无法监听客户端！错误信息：" + err.Error())
-	}
-	zap.L().Info("服务器监听地址：" + lis.Addr().String())
-
-	//注册服务健康检查
-	grpc_health_v1.RegisterHealthServer(s, health.NewServer())
-
-	//服务注册
-	register_client := consul.NewRegistryClient(global.GlobalConfig.Consul.Address, global.GlobalConfig.Consul.Port)
-	register_client.Register("localhost", port, "PublishAction", "PublishAction")
-
-	if err := s.Serve(lis); err != nil {
-		zap.L().Error("无法提供服务！错误信息：" + err.Error())
-	}
 }

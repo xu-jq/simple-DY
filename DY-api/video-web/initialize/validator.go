@@ -1,3 +1,10 @@
+/*
+ * @Date: 2023-01-19 11:21:47
+ * @LastEditors: xu junqi, zhang zhao
+ * @LastEditTime: 2023-01-29 10:15:07
+ * @FilePath: /simple-DY/DY-api/video-web/initialize/validator.go
+ * @Description:
+ */
 package initialize
 
 import (

@@ -1,6 +1,6 @@
 /*
  * @Date: 2023-01-19 11:21:47
- * @LastEditors: zhang zhao
+ * @LastEditors: xu junqi, zhang zhao
  * @LastEditTime: 2023-01-28 22:35:12
  * @FilePath: /simple-DY/DY-api/video-web/api/base.go
  * @Description:

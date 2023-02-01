@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 22:38:59
+ * @LastEditTime: 2023-02-01 22:44:45
  * @FilePath: /simple-DY/DY-api/video-web/initialize/srv_conn.go
  * @Description: 初始化客户端GRPC连接
  */
@@ -10,6 +10,7 @@ package initialize
 import (
 	"simple-DY/DY-api/video-web/global"
 	pb "simple-DY/DY-api/video-web/proto"
+	"simple-DY/DY-api/video-web/utils/consul"
 
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"go.uber.org/zap"
@@ -84,4 +85,12 @@ func InitSrvConn() {
 	}
 	zap.L().Info("UserRegister初始化连接成功！")
 	global.UserRegisterSrvClient = pb.NewUserRegisterClient(conn)
+
+	// 服务注册
+	registerClient := consul.NewRegistryClient(global.GlobalConfig.Consul.Address, global.GlobalConfig.Consul.Port)
+	err = registerClient.Register(global.GlobalConfig.MainServer.Address, global.GlobalConfig.MainServer.Port, "video-api", "video-api")
+	if err != nil {
+		zap.L().Error("Consul服务注册失败！错误信息：" + err.Error())
+	}
+	zap.L().Info("Consul服务注册成功！")
 }

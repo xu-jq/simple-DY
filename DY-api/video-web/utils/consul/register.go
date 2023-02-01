@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-27 16:24:44
- * @LastEditors: xu junqi, zhang zhao
- * @LastEditTime: 2023-01-29 10:17:07
- * @FilePath: /simple-DY/DY-srvs/video-srv/utils/consul/register.go
+ * @LastEditors: zhang zhao
+ * @LastEditTime: 2023-02-01 23:01:53
+ * @FilePath: /simple-DY/DY-api/video-web/utils/consul/register.go
  * @Description: Consul
  */
 package consul
@@ -40,7 +40,7 @@ func (r *Registry) Register(address string, port string, name string, id string)
 	}
 	//生成对应的检查对象
 	check := &api.AgentServiceCheck{
-		GRPC:                           address + ":" + port,
+		HTTP:                           "http://" + address + ":" + port + "/health",
 		Timeout:                        "5s",
 		Interval:                       "5s",
 		DeregisterCriticalServiceAfter: "10s",
@@ -56,7 +56,7 @@ func (r *Registry) Register(address string, port string, name string, id string)
 	registration.Name = name
 	registration.ID = id
 	registration.Port = int(portInt)
-	registration.Tags = []string{"video", "srv"}
+	registration.Tags = []string{"video", "api"}
 	registration.Address = address
 	registration.Check = check
 

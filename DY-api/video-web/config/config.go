@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 22:45:34
+ * @LastEditTime: 2023-02-01 22:44:37
  * @FilePath: /simple-DY/DY-api/video-web/config/config.go
  * @Description: 配置文件结构体
  */
@@ -11,6 +11,7 @@ type Config struct {
 	MainServer MainServer // 主服务器
 	GRPC       GRPC       // GRPC相关
 	Consul     Consul     // Consul相关
+	JWT        JWT        // JWT鉴权
 }
 
 // 主服务器
@@ -41,4 +42,10 @@ type GRPCTimeOut struct {
 type Consul struct {
 	Address string // 地址
 	Port    string // 端口
+}
+
+// 鉴权
+type JWT struct {
+	Secret           string // JWT密钥
+	TokenExpiresTime int64  // Token失效时间（秒）
 }

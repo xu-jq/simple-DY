@@ -1,13 +1,14 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 22:46:20
+ * @LastEditTime: 2023-02-01 14:55:10
  * @FilePath: /simple-DY/DY-srvs/video-srv/config/config.go
  * @Description: 配置文件结构体
  */
 package config
 
 type Config struct {
+	Address      Address      // 地址
 	GRPC         GRPC         // GRPC相关
 	MySQL        MySQL        // 数据库
 	OSS          OSS          // 静态资源存储
@@ -18,15 +19,21 @@ type Config struct {
 	Consul       Consul       // Consul
 }
 
+// 地址相关
+type Address struct {
+	Out string // 本机外网地址
+	In  string // 本机内网地址
+}
+
 // GRPC相关
 type GRPC struct {
-	Address           string      // GRPC服务地址
-	FeedPort          string      // Feed服务端口号
-	PublishActionPort string      // PublishAction服务端口号
-	PublishListPort   string      // PublishList服务端口号
-	UserInfoPort      string      // UserInfo服务端口号
-	UserLoginPort     string      // UserLogin服务端口号
-	UserRegisterPort  string      // UserRegister服务端口号
+	Address           string // GRPC服务地址
+	FeedPort          string
+	PublishActionPort string
+	PublishListPort   string
+	UserInfoPort      string
+	UserLoginPort     string
+	UserRegisterPort  string
 	GRPCMsgSize       GRPCMsgSize // GRPC消息传递大小限制
 	GRPCTimeOut       GRPCTimeOut // GRPC超时时间
 }

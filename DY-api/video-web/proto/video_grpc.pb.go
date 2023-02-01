@@ -533,3 +533,269 @@ var UserLogin_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "video.proto",
 }
+
+// SocialServiceClient is the client API for SocialService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type SocialServiceClient interface {
+	GetFollowList(ctx context.Context, in *GetFollowListRequest, opts ...grpc.CallOption) (*GetFollowListResponse, error)
+	GetFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
+	GetFriendList(ctx context.Context, in *GetFriendListRequest, opts ...grpc.CallOption) (*GetFriendListResponse, error)
+	RelationAction(ctx context.Context, in *RelationActionRequest, opts ...grpc.CallOption) (*RelationActionResponse, error)
+	MsgChat(ctx context.Context, in *MsgChatRequest, opts ...grpc.CallOption) (*MsgChatResponse, error)
+	MsgAction(ctx context.Context, in *MsgActionRequest, opts ...grpc.CallOption) (*MsgActionResponse, error)
+}
+
+type socialServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSocialServiceClient(cc grpc.ClientConnInterface) SocialServiceClient {
+	return &socialServiceClient{cc}
+}
+
+func (c *socialServiceClient) GetFollowList(ctx context.Context, in *GetFollowListRequest, opts ...grpc.CallOption) (*GetFollowListResponse, error) {
+	out := new(GetFollowListResponse)
+	err := c.cc.Invoke(ctx, "/proto.SocialService/GetFollowList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *socialServiceClient) GetFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error) {
+	out := new(FollowerListResponse)
+	err := c.cc.Invoke(ctx, "/proto.SocialService/GetFollowerList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *socialServiceClient) GetFriendList(ctx context.Context, in *GetFriendListRequest, opts ...grpc.CallOption) (*GetFriendListResponse, error) {
+	out := new(GetFriendListResponse)
+	err := c.cc.Invoke(ctx, "/proto.SocialService/GetFriendList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *socialServiceClient) RelationAction(ctx context.Context, in *RelationActionRequest, opts ...grpc.CallOption) (*RelationActionResponse, error) {
+	out := new(RelationActionResponse)
+	err := c.cc.Invoke(ctx, "/proto.SocialService/RelationAction", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *socialServiceClient) MsgChat(ctx context.Context, in *MsgChatRequest, opts ...grpc.CallOption) (*MsgChatResponse, error) {
+	out := new(MsgChatResponse)
+	err := c.cc.Invoke(ctx, "/proto.SocialService/MsgChat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *socialServiceClient) MsgAction(ctx context.Context, in *MsgActionRequest, opts ...grpc.CallOption) (*MsgActionResponse, error) {
+	out := new(MsgActionResponse)
+	err := c.cc.Invoke(ctx, "/proto.SocialService/MsgAction", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SocialServiceServer is the server API for SocialService service.
+// All implementations must embed UnimplementedSocialServiceServer
+// for forward compatibility
+type SocialServiceServer interface {
+	GetFollowList(context.Context, *GetFollowListRequest) (*GetFollowListResponse, error)
+	GetFollowerList(context.Context, *FollowerListRequest) (*FollowerListResponse, error)
+	GetFriendList(context.Context, *GetFriendListRequest) (*GetFriendListResponse, error)
+	RelationAction(context.Context, *RelationActionRequest) (*RelationActionResponse, error)
+	MsgChat(context.Context, *MsgChatRequest) (*MsgChatResponse, error)
+	MsgAction(context.Context, *MsgActionRequest) (*MsgActionResponse, error)
+	mustEmbedUnimplementedSocialServiceServer()
+}
+
+// UnimplementedSocialServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedSocialServiceServer struct {
+}
+
+func (UnimplementedSocialServiceServer) GetFollowList(context.Context, *GetFollowListRequest) (*GetFollowListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFollowList not implemented")
+}
+func (UnimplementedSocialServiceServer) GetFollowerList(context.Context, *FollowerListRequest) (*FollowerListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFollowerList not implemented")
+}
+func (UnimplementedSocialServiceServer) GetFriendList(context.Context, *GetFriendListRequest) (*GetFriendListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFriendList not implemented")
+}
+func (UnimplementedSocialServiceServer) RelationAction(context.Context, *RelationActionRequest) (*RelationActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RelationAction not implemented")
+}
+func (UnimplementedSocialServiceServer) MsgChat(context.Context, *MsgChatRequest) (*MsgChatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MsgChat not implemented")
+}
+func (UnimplementedSocialServiceServer) MsgAction(context.Context, *MsgActionRequest) (*MsgActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MsgAction not implemented")
+}
+func (UnimplementedSocialServiceServer) mustEmbedUnimplementedSocialServiceServer() {}
+
+// UnsafeSocialServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SocialServiceServer will
+// result in compilation errors.
+type UnsafeSocialServiceServer interface {
+	mustEmbedUnimplementedSocialServiceServer()
+}
+
+func RegisterSocialServiceServer(s grpc.ServiceRegistrar, srv SocialServiceServer) {
+	s.RegisterService(&SocialService_ServiceDesc, srv)
+}
+
+func _SocialService_GetFollowList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFollowListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).GetFollowList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.SocialService/GetFollowList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).GetFollowList(ctx, req.(*GetFollowListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SocialService_GetFollowerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FollowerListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).GetFollowerList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.SocialService/GetFollowerList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).GetFollowerList(ctx, req.(*FollowerListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SocialService_GetFriendList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFriendListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).GetFriendList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.SocialService/GetFriendList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).GetFriendList(ctx, req.(*GetFriendListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SocialService_RelationAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RelationActionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).RelationAction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.SocialService/RelationAction",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).RelationAction(ctx, req.(*RelationActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SocialService_MsgChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgChatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).MsgChat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.SocialService/MsgChat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).MsgChat(ctx, req.(*MsgChatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SocialService_MsgAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgActionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).MsgAction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.SocialService/MsgAction",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).MsgAction(ctx, req.(*MsgActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// SocialService_ServiceDesc is the grpc.ServiceDesc for SocialService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var SocialService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.SocialService",
+	HandlerType: (*SocialServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetFollowList",
+			Handler:    _SocialService_GetFollowList_Handler,
+		},
+		{
+			MethodName: "GetFollowerList",
+			Handler:    _SocialService_GetFollowerList_Handler,
+		},
+		{
+			MethodName: "GetFriendList",
+			Handler:    _SocialService_GetFriendList_Handler,
+		},
+		{
+			MethodName: "RelationAction",
+			Handler:    _SocialService_RelationAction_Handler,
+		},
+		{
+			MethodName: "MsgChat",
+			Handler:    _SocialService_MsgChat_Handler,
+		},
+		{
+			MethodName: "MsgAction",
+			Handler:    _SocialService_MsgAction_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "video.proto",
+}
