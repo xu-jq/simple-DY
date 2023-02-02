@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 22:42:03
+ * @LastEditTime: 2023-02-02 15:38:28
  * @FilePath: /simple-DY/DY-api/video-web/api/userregister.go
  * @Description: 1.3.2 用户注册
  */
@@ -11,6 +11,7 @@ import (
 	"context"
 	"net/http"
 	"simple-DY/DY-api/video-web/global"
+	"simple-DY/DY-api/video-web/middlewares"
 	"simple-DY/DY-api/video-web/models"
 	pb "simple-DY/DY-api/video-web/proto"
 	"time"
@@ -57,7 +58,7 @@ func UserRegister(c *gin.Context) {
 			StatusMsg:  responseUserRegister.GetStatusMsg(),
 		},
 		UserId: responseUserRegister.GetUserId(),
-		Token:  responseUserRegister.GetToken(),
+		Token:  middlewares.GenerateToken(responseUserRegister.GetUserId()),
 	}
 
 	// 根据不同的返回状态码设置不同的http状态码

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 22:36:03
+ * @LastEditTime: 2023-02-02 16:46:58
  * @FilePath: /simple-DY/DY-api/video-web/global/global.go
  * @Description: 全局变量
  */
@@ -23,4 +23,5 @@ var (
 	UserInfoSrvClient      pb.UserInfoClient
 	UserLoginSrvClient     pb.UserLoginClient
 	UserRegisterSrvClient  pb.UserRegisterClient
+	SocialServiceClient    pb.SocialServiceClient
 )

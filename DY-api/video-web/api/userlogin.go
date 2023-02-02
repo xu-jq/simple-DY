@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 22:41:44
+ * @LastEditTime: 2023-02-02 15:38:57
  * @FilePath: /simple-DY/DY-api/video-web/api/userlogin.go
  * @Description: 1.3.3 用户登录
  */
@@ -11,6 +11,7 @@ import (
 	"context"
 	"net/http"
 	"simple-DY/DY-api/video-web/global"
+	"simple-DY/DY-api/video-web/middlewares"
 	"simple-DY/DY-api/video-web/models"
 	pb "simple-DY/DY-api/video-web/proto"
 	"time"
@@ -57,7 +58,7 @@ func UserLogin(c *gin.Context) {
 			StatusMsg:  responseUserLogin.GetStatusMsg(),
 		},
 		UserId: responseUserLogin.GetUserId(),
-		Token:  responseUserLogin.GetToken(),
+		Token:  middlewares.GenerateToken(responseUserLogin.GetUserId()),
 	}
 
 	// 根据不同的返回状态码设置不同的http状态码

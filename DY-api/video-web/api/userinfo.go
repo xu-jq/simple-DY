@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 22:41:14
+ * @LastEditTime: 2023-02-02 18:47:34
  * @FilePath: /simple-DY/DY-api/video-web/api/userinfo.go
  * @Description: 1.3.1 用户信息
  */
@@ -23,32 +23,27 @@ import (
 // 1.3.1 用户信息
 
 func UserInfo(c *gin.Context) {
-
-	responseUserInfo, err := douyinUser(c.Query("user_id"))
-	if err != nil {
-		zap.L().Error("GRPC失败！错误信息：" + err.Error())
-		return
-	}
-
-	// Todo 调用其他服务获取关注总数、粉丝总数和UserId与Token解析出来的ID的关注关系
-
+	// 获取请求中的userid（字符串形式）
+	idString := c.Query("user_id")
+	// 填充User结构体的内容
+	id, followCount, followerCount, name, statusMsg, statusCode, isFollow := userService(c, idString)
 	// 将接收的服务端响应绑定到结构体上
 	userResponse := models.UserResponse{
 		Res: models.ResponseCodeAndMessage{
-			StatusCode: responseUserInfo.GetStatusCode(),
-			StatusMsg:  responseUserInfo.GetStatusMsg(),
+			StatusCode: statusCode,
+			StatusMsg:  statusMsg,
 		},
 		User: models.User{
-			Id:            responseUserInfo.User.GetId(),
-			Name:          responseUserInfo.User.GetName(),
-			FollowCount:   1,    // Todo 关注总数
-			FollowerCount: 1,    // Todo 粉丝总数
-			IsFollow:      true, // Todo 关注关系
+			Id:            id,
+			Name:          name,
+			FollowCount:   followCount,
+			FollowerCount: followerCount,
+			IsFollow:      isFollow,
 		},
 	}
 
 	// 根据不同的返回状态码设置不同的http状态码
-	if userResponse.Res.StatusCode == 0 {
+	if statusCode == 0 {
 		c.JSON(http.StatusOK, userResponse)
 	} else {
 		c.JSON(http.StatusBadRequest, userResponse)

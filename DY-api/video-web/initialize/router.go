@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-01 23:30:06
+ * @LastEditTime: 2023-02-02 16:15:30
  * @FilePath: /simple-DY/DY-api/video-web/initialize/router.go
  * @Description: 路由表
  */
@@ -45,11 +45,11 @@ func Routers(debug bool) *gin.Engine {
 	// 1.2 视频上传及发布
 	PublishRouter := DouyinRouter.Group("/publish")
 	{
+		PublishRouter.Use(middlewares.JWTAuth())
 		// 1.2.1 视频发布列表
 		// 用户的视频发布列表，直接列出用户所有投稿过的视频
 		PublishRouter.GET(
 			"/list/",
-			// jwt.Auth(),
 			api.PublishList,
 		)
 
@@ -57,7 +57,6 @@ func Routers(debug bool) *gin.Engine {
 		// 登录用户选择视频上传
 		PublishRouter.POST(
 			"/action/",
-			// jwt.AuthBody(),
 			api.PublishAction,
 		)
 	}
@@ -69,7 +68,7 @@ func Routers(debug bool) *gin.Engine {
 		// 获取用户的 id、昵称，如果实现社交部分的功能，还会返回关注数和粉丝数
 		UserRouter.GET(
 			"/",
-			// jwt.Auth(),
+			middlewares.JWTAuth(),
 			api.UserInfo,
 		)
 

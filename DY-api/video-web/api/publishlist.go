@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-28 22:41:05
+ * @LastEditTime: 2023-02-02 19:26:08
  * @FilePath: /simple-DY/DY-api/video-web/api/publishlist.go
  * @Description: 1.2.1 视频发布列表
  */
@@ -14,6 +14,7 @@ import (
 	"simple-DY/DY-api/video-web/models"
 	pb "simple-DY/DY-api/video-web/proto"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -24,12 +25,12 @@ import (
 
 func PublishList(c *gin.Context) {
 
-	responsePublishList, err := douyinPublishList(c.Query("user_id"))
+	idString := c.Query("user_id")
+
+	responsePublishList, err := douyinPublishList(idString)
 	if err != nil {
 		zap.L().Error("GRPC失败！错误信息：" + err.Error())
 	}
-
-	// Todo 调用其他服务获取关注总数、粉丝总数和UserId与Token解析出来的ID的关注关系
 
 	// 处理接收到的数据
 	videolistLen := len(responsePublishList.GetVideoList())
@@ -37,25 +38,36 @@ func PublishList(c *gin.Context) {
 
 	responsePublishListVideoList := responsePublishList.GetVideoList()
 
+	// User 信息（因为查询的是发布列表，所以就一个用户信息）
+	id, followCount, followerCount, name, _, _, isFollow := userService(c, idString)
+
+	var wgPublishList sync.WaitGroup
+
 	for idx := 0; idx < videolistLen; idx += 1 {
-
-		// Todo 调用其他服务获取视频点赞总数、视频评论总数和Token解析出来的ID是否对这个视频点赞
-
-		videolist[idx].Id = responsePublishListVideoList[idx].GetId()
-		videolist[idx].Author = models.User{
-			Id:            responsePublishListVideoList[idx].GetAuthor().GetId(),
-			Name:          responsePublishListVideoList[idx].GetAuthor().GetName(),
-			FollowCount:   1,    // Todo 关注总数
-			FollowerCount: 1,    // Todo 粉丝总数
-			IsFollow:      true, // Todo 关注关系
-		}
-		videolist[idx].PlayUrl = responsePublishListVideoList[idx].GetPlayUrl()
-		videolist[idx].CoverUrl = responsePublishListVideoList[idx].GetCoverUrl()
-		videolist[idx].FavoriteCount = 1 // Todo 视频点赞总数
-		videolist[idx].CommentCount = 1  // Todo 视频评论总数
-		videolist[idx].IsFavorite = true // Todo 是否点赞
-		videolist[idx].Title = responsePublishListVideoList[idx].GetTitle()
+		wgPublishList.Add(1)
+		go func(idx int) {
+			defer wgPublishList.Done()
+			videoIdInt64 := responsePublishListVideoList[idx].GetId()
+			videoIdString := strconv.FormatInt(videoIdInt64, 10)
+			videolist[idx].Id = videoIdInt64
+			videolist[idx].Author = models.User{
+				Id:            id,
+				Name:          name,
+				FollowCount:   followCount,
+				FollowerCount: followerCount,
+				IsFollow:      isFollow,
+			}
+			// Video 信息
+			favoriteCount, commentCount, isFavorite := videoService(c, videoIdString)
+			videolist[idx].PlayUrl = responsePublishListVideoList[idx].GetPlayUrl()
+			videolist[idx].CoverUrl = responsePublishListVideoList[idx].GetCoverUrl()
+			videolist[idx].FavoriteCount = favoriteCount
+			videolist[idx].CommentCount = commentCount
+			videolist[idx].IsFavorite = isFavorite
+			videolist[idx].Title = responsePublishListVideoList[idx].GetTitle()
+		}(idx)
 	}
+	wgPublishList.Wait()
 
 	// 将接收的服务端响应绑定到结构体上
 	publishListResponse := models.PublishListResponse{

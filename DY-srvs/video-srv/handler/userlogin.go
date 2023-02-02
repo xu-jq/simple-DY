@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-29 10:00:59
+ * @LastEditTime: 2023-02-02 15:25:28
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userlogin.go
  * @Description: UserLogin服务
  */
@@ -11,7 +11,6 @@ import (
 	"context"
 	pb "simple-DY/DY-srvs/video-srv/proto"
 	"simple-DY/DY-srvs/video-srv/utils/dao"
-	"simple-DY/DY-srvs/video-srv/utils/jwt"
 	"simple-DY/DY-srvs/video-srv/utils/md5salt"
 
 	"go.uber.org/zap"
@@ -52,7 +51,7 @@ func (s *Userloginserver) UserLogin(ctx context.Context, in *pb.DouyinUserLoginR
 	userLoginResponse.StatusCode = 0
 	userLoginResponse.StatusMsg = "登录成功！"
 	userLoginResponse.UserId = user.Id
-	userLoginResponse.Token = jwt.GenerateToken(user.Id)
+	// userLoginResponse.Token = jwt.GenerateToken(user.Id)
 	zap.L().Info("用户名和密码正确！登录成功！")
 
 	return &userLoginResponse, nil

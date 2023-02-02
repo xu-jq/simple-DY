@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-29 10:01:26
+ * @LastEditTime: 2023-02-02 15:25:23
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userregister.go
  * @Description: UserRegister服务
  */
@@ -11,7 +11,6 @@ import (
 	"context"
 	pb "simple-DY/DY-srvs/video-srv/proto"
 	"simple-DY/DY-srvs/video-srv/utils/dao"
-	"simple-DY/DY-srvs/video-srv/utils/jwt"
 	"simple-DY/DY-srvs/video-srv/utils/md5salt"
 
 	"go.uber.org/zap"
@@ -47,7 +46,7 @@ func (s *Userregisterserver) UserRegister(ctx context.Context, in *pb.DouyinUser
 	userRegisterResponse.StatusCode = 0
 	userRegisterResponse.StatusMsg = "注册成功！"
 	userRegisterResponse.UserId = id
-	userRegisterResponse.Token = jwt.GenerateToken(id)
+	// userRegisterResponse.Token = jwt.GenerateToken(id)
 
 	zap.L().Info("注册成功！")
 
