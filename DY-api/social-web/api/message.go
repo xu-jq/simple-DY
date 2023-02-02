@@ -16,7 +16,8 @@ import (
 )
 
 func MsgChat(ctx *gin.Context) {
-	userId, _ := ctx.Get("userId")
+	zap.S().Info("-------MsgChat-------")
+	userId, _ := ctx.Get("user_id")
 	toUserID := ctx.DefaultQuery("to_user_id", "0")
 	id, _ := strconv.Atoi(toUserID)
 	zap.S().Info("接受的参数to_user_id：", id)
@@ -42,8 +43,9 @@ func MsgChat(ctx *gin.Context) {
 }
 
 func MsgAction(ctx *gin.Context) {
+	zap.S().Info("-------MsgAction-------")
 	// 接受数据以及表单验证
-	userId, _ := ctx.Get("userId")
+	userId, _ := ctx.Get("user_id")
 	reqForm := forms.MsgActionReq{}
 	if err := ctx.ShouldBindJSON(&reqForm); err != nil {
 		HandleValidatorError(ctx, err)

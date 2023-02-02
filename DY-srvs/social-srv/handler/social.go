@@ -19,11 +19,13 @@ type SocialServer struct {
 	*proto.UnimplementedSocialServiceServer
 }
 
-// GetFollowList 获取用户关注列表
+// GetFollowList 获取用户关注的所有用户列表。
 func (s *SocialServer) GetFollowList(c context.Context, req *proto.GetFollowListRequest) (*proto.GetFollowListResponse, error) {
 	zap.S().Info("GetFollowList Running")
-	var follows []model.Follows
-	result := global.DB.Where(&model.Follows{FollowerID: req.UserId}).Find(&follows)
+	var follows []model.FollowsAndUser
+	result := global.DB.Raw("SELECT users.name,follows.user_id,follows.follower_id "+
+		"FROM users LEFT JOIN follows ON follows.user_id = users.id where users.id = ?", req.UserId).
+		Find(&follows)
 	if result.Error != nil {
 		zap.S().Error("GetFollowList出错：", result.Error)
 		return nil, result.Error
@@ -31,31 +33,55 @@ func (s *SocialServer) GetFollowList(c context.Context, req *proto.GetFollowList
 	zap.S().Info(result)
 	resp := &proto.GetFollowListResponse{}
 	for _, v := range follows {
-		resp.UserList = append(resp.GetUserList(), &proto.User{Id: v.FollowerID})
+		resp.UserList = append(resp.GetUserList(), &proto.User{
+			Id:            v.ID,
+			Name:          v.Name,
+			FollowCount:   int64(len(follows)),
+			FollowerCount: 10,
+			IsFollow:      true,
+		})
 	}
 	return resp, nil
 }
 
 // GetFollowerList 用户粉丝列表
 func (s *SocialServer) GetFollowerList(c context.Context, req *proto.FollowerListRequest) (*proto.FollowerListResponse, error) {
-	zap.S().Info("GetFollowerList Running")
-	var follows []model.Follows
-	result := global.DB.Where(&model.Follows{UserID: req.UserId}).Find(&follows)
+	zap.S().Info("GetFollowList Running")
+	var follows []model.FollowsAndUser
+	result := global.DB.Raw("SELECT users.name,follows.user_id,follows.follower_id "+
+		"FROM users LEFT JOIN follows ON follows.user_id = users.id where users.id = ?", req.UserId).
+		Find(&follows)
 	if result.Error != nil {
-		zap.S().Error("GetFollowerList出错：", result.Error)
+		zap.S().Error("GetFollowList出错：", result.Error)
 		return nil, result.Error
 	}
 	zap.S().Info(result)
 	resp := &proto.FollowerListResponse{}
 	for _, v := range follows {
-		resp.UserList = append(resp.GetUserList(), &proto.User{Id: v.FollowerID})
+		resp.UserList = append(resp.GetUserList(), &proto.User{
+			Id:            v.ID,
+			Name:          v.Name,
+			FollowCount:   int64(len(follows)),
+			FollowerCount: 10,
+			IsFollow:      true,
+		})
 	}
 	return resp, nil
 }
 
 // GetFriendList 用户好友列表
 func (s *SocialServer) GetFriendList(c context.Context, req *proto.GetFriendListRequest) (*proto.GetFriendListResponse, error) {
-	return nil, nil
+	return &proto.GetFriendListResponse{
+		UserList: []*proto.User{
+			{
+				Id:            1,
+				Name:          "wanghui",
+				FollowCount:   10,
+				FollowerCount: 10,
+				IsFollow:      true,
+			},
+		},
+	}, nil
 }
 
 // RelationAction 取关和关注
@@ -86,7 +112,10 @@ func (s *SocialServer) RelationAction(c context.Context, req *proto.RelationActi
 			FollowerID: req.UserId,
 		})
 	}
-	return nil, result.Error
+	if result.Error != nil {
+		zap.S().Error("RelationAction出错：", result.Error)
+	}
+	return &proto.RelationActionResponse{}, nil
 }
 
 func (s *SocialServer) MsgChat(c context.Context, req *proto.MsgChatRequest) (*proto.MsgChatResponse, error) {
@@ -120,8 +149,8 @@ func (s *SocialServer) MsgAction(c context.Context, req *proto.MsgActionRequest)
 		})
 		if result.Error != nil {
 			zap.S().Error("MsgAction：", result.Error)
-			return nil, nil
+			return &proto.MsgActionResponse{}, nil
 		}
 	}
-	return nil, nil
+	return &proto.MsgActionResponse{}, nil
 }

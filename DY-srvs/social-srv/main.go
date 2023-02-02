@@ -21,8 +21,8 @@ import (
 )
 
 func main() {
-	IP := flag.String("ip", "192.168.123.150", "ip地址")
-	Port := flag.Int("port", 0, "端口号")
+	IP := flag.String("ip", "10.0.16.7", "ip地址")
+	Port := flag.Int("port", 8101, "端口号")
 
 	//初始化
 	initialize.InitLogger()
@@ -58,7 +58,7 @@ func main() {
 	}
 	//生成对应的检查对象
 	check := &api.AgentServiceCheck{
-		GRPC:                           fmt.Sprintf("%s:%d", *IP, *Port),
+		GRPC:                           fmt.Sprintf("124.221.120.88:%d", *Port),
 		Timeout:                        "5s",
 		Interval:                       "5s",
 		DeregisterCriticalServiceAfter: "15s",
@@ -71,7 +71,7 @@ func main() {
 	registration.ID = serviceID
 	registration.Port = *Port
 	registration.Tags = []string{"social", "srv"}
-	registration.Address = *IP
+	registration.Address = "124.221.120.88"
 	registration.Check = check
 	//1. 如何启动两个服务
 	//2. 即使我能够通过终端启动两个服务，但是注册到consul中的时候也会被覆盖

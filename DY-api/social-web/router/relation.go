@@ -5,11 +5,6 @@
  * @FilePath: /simple-DY/DY-api/social-web/router/relation.go
  * @Description:
  */
-/**
-* @Author Wang Hui
-* @Description
-* @Date
-**/
 package router
 
 import (
@@ -19,7 +14,7 @@ import (
 )
 
 func InitRelationRouter(Router *gin.RouterGroup) {
-	relationRouter := Router.Group("relation")
+	relationRouter := Router.Group("/relation")
 	{
 		relationRouter.GET("/follow/list", api.GetFollowList)
 		relationRouter.GET("/follower/list", api.GetFollowerList)

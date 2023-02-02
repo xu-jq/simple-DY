@@ -21,7 +21,7 @@ func InitRouter() *gin.Engine {
 	//配置跨域
 	Router.Use(middlewares.Cors())
 	//添加链路追踪
-	group := Router.Group("/douying")
+	group := Router.Group("/douyin")
 	router.InitMsgRouter(group)
 	router.InitRelationRouter(group)
 	return Router

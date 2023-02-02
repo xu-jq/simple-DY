@@ -10,6 +10,7 @@ package model
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"simple-DY/DY-srvs/video-srv/models"
 	"time"
 
 	"gorm.io/gorm"
@@ -46,4 +47,9 @@ type Message struct {
 	ToUserID int64     `gorm:"column:to_user_id" json:"to_user_id"`
 	SentTime time.Time `gorm:"column:sent_time" json:"sent_time"`
 	Content  string    `gorm:"column:content" json:"content"`
+}
+
+type FollowsAndUser struct {
+	models.Users
+	Follows
 }

@@ -17,7 +17,7 @@ import (
 
 func RelationAction(ctx *gin.Context) {
 	// auth中间件解析后，将userId存入ctx中。
-	userId, _ := ctx.Get("userId")
+	userId, _ := ctx.Get("user_id")
 
 	// 验证表单
 	reqForm := forms.RelationActionReq{}
@@ -43,7 +43,8 @@ func RelationAction(ctx *gin.Context) {
 }
 
 func GetFollowList(ctx *gin.Context) {
-	userID := ctx.DefaultQuery("userID", "0")
+	zap.S().Info("-------GetFollowList-------")
+	userID := ctx.DefaultQuery("user_id", "0")
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 		return
@@ -60,7 +61,7 @@ func GetFollowList(ctx *gin.Context) {
 		return
 	}
 	for _, v := range list.UserList {
-		userList = append(userList, v.Id)
+		userList = append(userList, v)
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": 0,
@@ -70,7 +71,8 @@ func GetFollowList(ctx *gin.Context) {
 }
 
 func GetFollowerList(ctx *gin.Context) {
-	userID := ctx.DefaultQuery("userID", "0")
+	zap.S().Info("-------GetFollowerList-------")
+	userID := ctx.DefaultQuery("user_id", "0")
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 		return
@@ -97,7 +99,7 @@ func GetFollowerList(ctx *gin.Context) {
 }
 
 func GetFriendList(ctx *gin.Context) {
-	userID := ctx.DefaultQuery("userID", "0")
+	userID := ctx.DefaultQuery("user_id", "0")
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 		return

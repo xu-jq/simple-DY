@@ -33,6 +33,8 @@ func InitDB() {
 		},
 		Logger: newLogger,
 	})
+	db, err := global.DB.DB()
+	db.SetConnMaxLifetime(time.Minute * 5)
 	if err != nil {
 		panic(err)
 	}
