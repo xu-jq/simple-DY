@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-19 22:05:18
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-01 21:55:34
- * @FilePath: /simple-DY/DY-api/video-web/proto/video.proto
+ * @LastEditTime: 2023-02-03 10:22:18
+ * @FilePath: /simple-DY/DY-srvs/video-srv/proto/video.proto
  * @Description: protobuf定义
  */
  
@@ -137,64 +137,3 @@ message douyin_user_login_response{
     int64 user_id = 3; // 用户id​
     string token = 4; // 用户鉴权token​
 }
-
-// social 部分
-service SocialService{
-    rpc GetFollowList(GetFollowListRequest) returns (GetFollowListResponse);
-    rpc GetFollowerList(FollowerListRequest) returns (FollowerListResponse);
-    rpc GetFriendList(GetFriendListRequest) returns (GetFriendListResponse);
-    rpc RelationAction(RelationActionRequest) returns (RelationActionResponse);
-    rpc MsgChat(MsgChatRequest) returns (MsgChatResponse);
-    rpc MsgAction(MsgActionRequest) returns (MsgActionResponse);
-  
-  }
-  
-  message MsgActionRequest{
-    int64 user_id =1;
-    int64 to_user_id=2;
-    int32 action_type = 3;
-    string content = 4;
-  
-  }
-  message MsgActionResponse{
-  }
-  message MsgChatRequest{
-    int64 user_id =1;
-    int64 to_user_id=2;
-  
-  }
-  message MsgChatResponse{
-    repeated Msg message_list=1;
-  }
-  message Msg{
-    int64 id = 1;
-    string content = 2;
-    string create_time=3;
-  }
-  message RelationActionRequest{
-    int64 user_id =1;
-    int64 to_user_id=2;
-    int32 action_type=3;
-  
-  }
-  message RelationActionResponse{
-  
-  }
-  message GetFriendListRequest{
-    int64 user_id=1;
-  }
-  message GetFriendListResponse{
-    repeated User user_list = 1;
-  }
-  message GetFollowListRequest{
-    int64 user_id=1;
-  }
-  message GetFollowListResponse{
-    repeated User user_list = 1;
-  }
-  message FollowerListRequest{
-    int64 user_id=1;
-  }
-  message FollowerListResponse{
-    repeated User user_list = 1;
-  }

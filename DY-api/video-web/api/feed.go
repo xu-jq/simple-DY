@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 14:08:05
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 19:29:09
+ * @LastEditTime: 2023-02-03 16:35:29
  * @FilePath: /simple-DY/DY-api/video-web/api/feed.go
  * @Description: 1.1 视频流接口
  */
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/models"
-	pb "simple-DY/DY-api/video-web/proto"
+	videopb "simple-DY/DY-api/video-web/proto/video"
 	"strconv"
 	"sync"
 	"time"
@@ -24,6 +24,7 @@ import (
 // 1.1 视频流接口 /douyin/feed/
 func Feed(c *gin.Context) {
 
+	// 请求服务1：获取视频
 	responseFeed, err := douyinFeed(c.Query("latest_time"))
 	if err != nil {
 		zap.L().Error("GRPC失败！错误信息：" + err.Error())
@@ -44,7 +45,7 @@ func Feed(c *gin.Context) {
 			authorIdInt64 := responseFeedVideoList[idx].GetAuthor().GetId()
 			authorIdString := strconv.FormatInt(authorIdInt64, 10)
 
-			// User 信息
+			// 请求服务2：User 信息
 			id, followCount, followerCount, name, _, _, isFollow := userService(c, authorIdString)
 
 			videoIdInt64 := responseFeedVideoList[idx].GetId()
@@ -58,7 +59,7 @@ func Feed(c *gin.Context) {
 				FollowerCount: followerCount,
 				IsFollow:      isFollow,
 			}
-			// Video 信息
+			// 请求服务3：Video 信息
 			favoriteCount, commentCount, isFavorite := videoService(c, videoIdString)
 			videolist[idx].PlayUrl = responseFeedVideoList[idx].GetPlayUrl()
 			videolist[idx].CoverUrl = responseFeedVideoList[idx].GetCoverUrl()
@@ -89,7 +90,7 @@ func Feed(c *gin.Context) {
 	zap.L().Info("返回响应成功！")
 }
 
-func douyinFeed(latest_time string) (responseFeed *pb.DouyinFeedResponse, err error) {
+func douyinFeed(latest_time string) (responseFeed *videopb.DouyinFeedResponse, err error) {
 	// 将接收的客户端请求参数绑定到结构体上
 	latestTime, err := strconv.ParseInt(latest_time, 10, 64)
 	if err != nil {
@@ -110,7 +111,7 @@ func douyinFeed(latest_time string) (responseFeed *pb.DouyinFeedResponse, err er
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
-	responseFeed, err = global.FeedSrvClient.Feed(ctx, &pb.DouyinFeedRequest{
+	responseFeed, err = global.FeedSrvClient.Feed(ctx, &videopb.DouyinFeedRequest{
 		LatestTime: feedRequest.LatestTime,
 	})
 

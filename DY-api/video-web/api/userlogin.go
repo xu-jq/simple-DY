@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 15:38:57
+ * @LastEditTime: 2023-02-03 10:27:43
  * @FilePath: /simple-DY/DY-api/video-web/api/userlogin.go
  * @Description: 1.3.3 用户登录
  */
@@ -13,7 +13,7 @@ import (
 	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/middlewares"
 	"simple-DY/DY-api/video-web/models"
-	pb "simple-DY/DY-api/video-web/proto"
+	videopb "simple-DY/DY-api/video-web/proto/video"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -40,7 +40,7 @@ func UserLogin(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
 
-	responseUserLogin, err := global.UserLoginSrvClient.UserLogin(ctx, &pb.DouyinUserLoginRequest{
+	responseUserLogin, err := global.UserLoginSrvClient.UserLogin(ctx, &videopb.DouyinUserLoginRequest{
 		Username: userLoginRequest.UserName,
 		Password: userLoginRequest.Password,
 	})

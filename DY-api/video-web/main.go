@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 19:41:36
+ * @LastEditTime: 2023-02-03 10:53:11
  * @FilePath: /simple-DY/DY-api/video-web/main.go
  * @Description: 主程序
  */
@@ -50,7 +50,7 @@ func main() {
 
 	// 服务注册
 	registerClient := consul.NewRegistryClient(global.GlobalConfig.Consul.Address, global.GlobalConfig.Consul.Port)
-	err = registerClient.Register(global.GlobalConfig.MainServer.Address, global.GlobalConfig.MainServer.Port, "video-api", "video-api")
+	err = registerClient.Register(global.GlobalConfig.MainServer.Address, global.GlobalConfig.MainServer.Port, "video-api", []string{"api", "video"})
 	if err != nil {
 		zap.L().Error("Consul服务注册失败！错误信息：" + err.Error())
 	}

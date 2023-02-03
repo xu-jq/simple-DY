@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 19:41:30
+ * @LastEditTime: 2023-02-03 10:29:57
  * @FilePath: /simple-DY/DY-api/video-web/initialize/srv_conn.go
  * @Description: 初始化客户端GRPC连接
  */
@@ -9,7 +9,8 @@ package initialize
 
 import (
 	"simple-DY/DY-api/video-web/global"
-	pb "simple-DY/DY-api/video-web/proto"
+	socialpb "simple-DY/DY-api/video-web/proto/social"
+	videopb "simple-DY/DY-api/video-web/proto/video"
 
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"go.uber.org/zap"
@@ -48,42 +49,42 @@ func InitSrvConn() {
 		zap.L().Error("Feed初始化连接失败！错误信息：" + err.Error())
 	}
 	zap.L().Info("Feed初始化连接成功！")
-	global.FeedSrvClient = pb.NewFeedClient(conn)
+	global.FeedSrvClient = videopb.NewFeedClient(conn)
 
 	conn, err = initConn("PublishAction")
 	if err != nil {
 		zap.L().Error("PublishAction初始化连接失败！错误信息：" + err.Error())
 	}
 	zap.L().Info("PublishAction初始化连接成功！")
-	global.PublishActionSrvClient = pb.NewPublishActionClient(conn)
+	global.PublishActionSrvClient = videopb.NewPublishActionClient(conn)
 
 	conn, err = initConn("PublishList")
 	if err != nil {
 		zap.L().Error("PublishList初始化连接失败！错误信息：" + err.Error())
 	}
 	zap.L().Info("PublishList初始化连接成功！")
-	global.PublishListSrvClient = pb.NewPublishListClient(conn)
+	global.PublishListSrvClient = videopb.NewPublishListClient(conn)
 
 	conn, err = initConn("UserInfo")
 	if err != nil {
 		zap.L().Error("UserInfo初始化连接失败！错误信息：" + err.Error())
 	}
 	zap.L().Info("UserInfo初始化连接成功！")
-	global.UserInfoSrvClient = pb.NewUserInfoClient(conn)
+	global.UserInfoSrvClient = videopb.NewUserInfoClient(conn)
 
 	conn, err = initConn("UserLogin")
 	if err != nil {
 		zap.L().Error("UserLogin初始化连接失败！错误信息：" + err.Error())
 	}
 	zap.L().Info("UserLogin初始化连接成功！")
-	global.UserLoginSrvClient = pb.NewUserLoginClient(conn)
+	global.UserLoginSrvClient = videopb.NewUserLoginClient(conn)
 
 	conn, err = initConn("UserRegister")
 	if err != nil {
 		zap.L().Error("UserRegister初始化连接失败！错误信息：" + err.Error())
 	}
 	zap.L().Info("UserRegister初始化连接成功！")
-	global.UserRegisterSrvClient = pb.NewUserRegisterClient(conn)
+	global.UserRegisterSrvClient = videopb.NewUserRegisterClient(conn)
 
 	// wang hui的服务初始化
 
@@ -92,7 +93,7 @@ func InitSrvConn() {
 		zap.L().Error("social-srv初始化连接失败！错误信息：" + err.Error())
 	}
 	zap.L().Info("social-srv初始化连接成功！")
-	global.SocialServiceClient = pb.NewSocialServiceClient(conn)
+	global.SocialServiceClient = socialpb.NewSocialServiceClient(conn)
 
 	// xu junqi的三个服务初始化
 }

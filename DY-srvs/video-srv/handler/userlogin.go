@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 15:25:28
+ * @LastEditTime: 2023-02-03 14:34:50
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userlogin.go
  * @Description: UserLogin服务
  */
@@ -25,7 +25,7 @@ func (s *Userloginserver) UserLogin(ctx context.Context, in *pb.DouyinUserLoginR
 	// 构建返回的响应
 	userLoginResponse := pb.DouyinUserLoginResponse{}
 
-	// 通过name获取Users表的信息
+	// 通过name获取Users表的信息，顺便把密码查询出来
 	user := dao.GetUserByName(in.Username)
 
 	// 如果这个用户不存在，则不能登录

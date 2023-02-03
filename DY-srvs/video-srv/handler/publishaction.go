@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-29 09:55:20
+ * @LastEditTime: 2023-02-03 15:41:40
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishaction.go
  * @Description: PublishAction服务
  */
@@ -53,7 +53,7 @@ func (s *Publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 	// 如果这个用户不存在，则不能返回信息
 	if user.Name == "" {
 		zap.L().Error("用户不存在！无法上传视频！")
-		publishActionResponse.StatusCode = 5
+		publishActionResponse.StatusCode = 2
 		publishActionResponse.StatusMsg = "用户不存在！"
 		return &publishActionResponse, nil
 	}
@@ -62,7 +62,7 @@ func (s *Publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 	fileName, videoStaticFileName, imageStaticFileName, err := backup.GenerateFilePath(tokenId.Id)
 	if err != nil {
 		zap.L().Error("备份文件夹操作失败！错误信息：" + err.Error())
-		publishActionResponse.StatusCode = 6
+		publishActionResponse.StatusCode = 5
 		publishActionResponse.StatusMsg = "备份文件夹操作失败！"
 		return &publishActionResponse, nil
 	}
@@ -72,7 +72,7 @@ func (s *Publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 	err = os.WriteFile(videoStaticFileName, []byte(in.Data), 0666)
 	if err != nil {
 		zap.L().Error("无法写入视频文件！错误信息：" + err.Error())
-		publishActionResponse.StatusCode = 7
+		publishActionResponse.StatusCode = 6
 		publishActionResponse.StatusMsg = "无法写入视频文件！"
 		return &publishActionResponse, nil
 	}
@@ -82,7 +82,7 @@ func (s *Publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 	err = ffmpeg.ExtractFirstFrame(videoStaticFileName, imageStaticFileName)
 	if err != nil {
 		zap.L().Error("无法写入图片文件！错误信息：" + err.Error())
-		publishActionResponse.StatusCode = 8
+		publishActionResponse.StatusCode = 7
 		publishActionResponse.StatusMsg = "无法写入图片文件！"
 		return &publishActionResponse, nil
 	}
@@ -104,7 +104,7 @@ func (s *Publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPu
 	})
 	if err != nil {
 		zap.L().Error("无法上传视频或图片文件！错误信息：" + err.Error())
-		publishActionResponse.StatusCode = 9
+		publishActionResponse.StatusCode = 8
 		publishActionResponse.StatusMsg = "无法上传文件！"
 		return &publishActionResponse, nil
 	}

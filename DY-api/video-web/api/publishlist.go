@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 19:26:08
+ * @LastEditTime: 2023-02-03 16:32:47
  * @FilePath: /simple-DY/DY-api/video-web/api/publishlist.go
  * @Description: 1.2.1 视频发布列表
  */
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/models"
-	pb "simple-DY/DY-api/video-web/proto"
+	videopb "simple-DY/DY-api/video-web/proto/video"
 	"strconv"
 	"sync"
 	"time"
@@ -27,6 +27,7 @@ func PublishList(c *gin.Context) {
 
 	idString := c.Query("user_id")
 
+	// 请求服务1：查询视频列表
 	responsePublishList, err := douyinPublishList(idString)
 	if err != nil {
 		zap.L().Error("GRPC失败！错误信息：" + err.Error())
@@ -38,7 +39,7 @@ func PublishList(c *gin.Context) {
 
 	responsePublishListVideoList := responsePublishList.GetVideoList()
 
-	// User 信息（因为查询的是发布列表，所以就一个用户信息）
+	// 请求服务2：User 信息（因为查询的是发布列表，所以就一个用户信息）
 	id, followCount, followerCount, name, _, _, isFollow := userService(c, idString)
 
 	var wgPublishList sync.WaitGroup
@@ -57,7 +58,7 @@ func PublishList(c *gin.Context) {
 				FollowerCount: followerCount,
 				IsFollow:      isFollow,
 			}
-			// Video 信息
+			// 请求服务3：Video 信息
 			favoriteCount, commentCount, isFavorite := videoService(c, videoIdString)
 			videolist[idx].PlayUrl = responsePublishListVideoList[idx].GetPlayUrl()
 			videolist[idx].CoverUrl = responsePublishListVideoList[idx].GetCoverUrl()
@@ -87,7 +88,7 @@ func PublishList(c *gin.Context) {
 	zap.L().Info("返回响应成功！")
 }
 
-func douyinPublishList(user_id string) (responsePublishList *pb.DouyinPublishListResponse, err error) {
+func douyinPublishList(user_id string) (responsePublishList *videopb.DouyinPublishListResponse, err error) {
 	// 将接收的客户端请求参数绑定到结构体上
 	userId, err := strconv.ParseInt(user_id, 10, 64)
 	if err != nil {
@@ -108,7 +109,7 @@ func douyinPublishList(user_id string) (responsePublishList *pb.DouyinPublishLis
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
-	responsePublishList, err = global.PublishListSrvClient.PublishList(ctx, &pb.DouyinPublishListRequest{
+	responsePublishList, err = global.PublishListSrvClient.PublishList(ctx, &videopb.DouyinPublishListRequest{
 		UserId: publishListRequest.UserId,
 	})
 	zap.L().Info("通过GRPC接收到的响应：" + responsePublishList.String())

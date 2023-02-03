@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 19:05:40
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-01 14:57:07
+ * @LastEditTime: 2023-02-03 10:52:57
  * @FilePath: /simple-DY/DY-srvs/video-srv/initialize/handler.go
  * @Description: 初始化服务协程
  */
@@ -88,7 +88,7 @@ func service(s *grpc.Server, port string, name string) {
 
 	//服务注册
 	register_client := consul.NewRegistryClient(global.GlobalConfig.Consul.Address, global.GlobalConfig.Consul.Port)
-	register_client.Register(global.GlobalConfig.Address.Out, port, name, name)
+	register_client.Register(global.GlobalConfig.Address.Out, port, name, []string{"srv", "video"})
 
 	if err := s.Serve(lis); err != nil {
 		zap.L().Error("无法提供服务！错误信息：" + err.Error())
