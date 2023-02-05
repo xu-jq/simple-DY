@@ -10,8 +10,8 @@ package middlewares
 import (
 	"errors"
 	"net/http"
+	"simple-DY/DY-api/social-web/global"
 	"simple-DY/DY-api/social-web/models"
-	"simple-DY/DY-srvs/video-srv/global"
 	"strconv"
 	"strings"
 	"time"
@@ -41,7 +41,7 @@ func JWTAuth() gin.HandlerFunc {
 		// parseToken 解析token包含的信息
 		claims, err := j.ParseToken(strings.Fields(token)[1])
 		if err != nil {
-			zap.S().Info(token)
+			zap.S().Info(err)
 			if err == TokenExpired {
 				if err == TokenExpired {
 					c.JSON(http.StatusUnauthorized, map[string]string{
@@ -75,7 +75,7 @@ var (
 
 func NewJWT() *JWT {
 	return &JWT{
-		[]byte(global.GlobalConfig.JWT.Secret), //可以设置过期时间
+		[]byte(global.ServerConfig.JWTInfo.SigningKey), //可以设置过期时间
 	}
 }
 
@@ -87,10 +87,12 @@ func (j *JWT) CreateToken(claims models.CustomClaims) (string, error) {
 
 // 解析 token
 func (j *JWT) ParseToken(tokenString string) (*models.CustomClaims, error) {
+	zap.S().Info(tokenString)
 	token, err := jwt.ParseWithClaims(tokenString, &models.CustomClaims{}, func(token *jwt.Token) (i interface{}, e error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
+		zap.S().Info(err)
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				return nil, TokenMalformed
@@ -140,8 +142,8 @@ func GenerateToken(id int64) string {
 	zap.L().Info("开始产生Token...")
 
 	// 设置Token过期时间
-	expiresTime := time.Now().Unix() + global.GlobalConfig.JWT.TokenExpiresTime
-	zap.L().Info("Token将于" + time.Unix(expiresTime, 0).Format(global.GlobalConfig.Time.TimeFormat) + "过期")
+	expiresTime := time.Now().Unix() + global.ServerConfig.JWTInfo.TokenExpiresTime
+	zap.L().Info("Token将于" + time.Unix(expiresTime, 0).Format(global.ServerConfig.JWTInfo.SigningKey) + "过期")
 
 	// 声明
 	claims := jwt.StandardClaims{
@@ -155,7 +157,7 @@ func GenerateToken(id int64) string {
 
 	// 生成Token
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString([]byte(global.GlobalConfig.JWT.Secret))
+	token, err := tokenClaims.SignedString([]byte(global.ServerConfig.JWTInfo.SigningKey))
 
 	// 判断生成Token是否成功
 	if err != nil {

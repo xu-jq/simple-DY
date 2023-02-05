@@ -14,7 +14,7 @@ import (
 func InitMsgRouter(Router *gin.RouterGroup) {
 	msgRouter := Router.Group("/message")
 	{
-		msgRouter.GET("/chat", middlewares.JWTAuth(), api.MsgChat)
+		msgRouter.GET("/chat/", middlewares.JWTAuth(), api.MsgChat)
 		msgRouter.POST("/action/", middlewares.JWTAuth(), api.MsgAction)
 	}
 }
