@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 15:25:23
+ * @LastEditTime: 2023-02-05 19:24:20
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userregister.go
  * @Description: UserRegister服务
  */
@@ -16,11 +16,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type Userregisterserver struct {
-	pb.UnimplementedUserRegisterServer
-}
-
-func (s *Userregisterserver) UserRegister(ctx context.Context, in *pb.DouyinUserRegisterRequest) (*pb.DouyinUserRegisterResponse, error) {
+func (s *Videoserver) UserRegister(ctx context.Context, in *pb.DouyinUserRegisterRequest) (*pb.DouyinUserRegisterResponse, error) {
 
 	// 构建返回的响应
 	userRegisterResponse := pb.DouyinUserRegisterResponse{}

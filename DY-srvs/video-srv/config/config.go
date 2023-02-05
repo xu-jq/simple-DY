@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-05 14:31:49
+ * @LastEditTime: 2023-02-05 19:26:17
  * @FilePath: /simple-DY/DY-srvs/video-srv/config/config.go
  * @Description: 配置文件结构体
  */
@@ -27,16 +27,10 @@ type Address struct {
 
 // GRPC相关
 type GRPC struct {
-	Address           string // GRPC服务地址
-	FeedPort          string
-	PublishActionPort string
-	PublishListPort   string
-	UserInfoPort      string
-	UserLoginPort     string
-	UserRegisterPort  string
-	VideoInfoPort     string
-	GRPCMsgSize       GRPCMsgSize // GRPC消息传递大小限制
-	GRPCTimeOut       GRPCTimeOut // GRPC超时时间
+	Address     string // GRPC服务地址
+	Port        string
+	GRPCMsgSize GRPCMsgSize // GRPC消息传递大小限制
+	GRPCTimeOut GRPCTimeOut // GRPC超时时间
 }
 
 // GRPC消息传递大小限制

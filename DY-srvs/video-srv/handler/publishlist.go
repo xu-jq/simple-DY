@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-29 09:59:42
+ * @LastEditTime: 2023-02-05 19:23:58
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishlist.go
  * @Description: PublishAction服务
  */
@@ -17,11 +17,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type Publishlistserver struct {
-	pb.UnimplementedPublishListServer
-}
-
-func (s *Publishlistserver) PublishList(ctx context.Context, in *pb.DouyinPublishListRequest) (*pb.DouyinPublishListResponse, error) {
+func (s *Videoserver) PublishList(ctx context.Context, in *pb.DouyinPublishListRequest) (*pb.DouyinPublishListResponse, error) {
 
 	// 构建返回的响应
 	publishListResponse := pb.DouyinPublishListResponse{}

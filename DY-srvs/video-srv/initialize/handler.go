@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 19:05:40
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-05 14:30:36
+ * @LastEditTime: 2023-02-05 19:25:33
  * @FilePath: /simple-DY/DY-srvs/video-srv/initialize/handler.go
  * @Description: 初始化服务协程
  */
@@ -23,59 +23,14 @@ import (
 )
 
 func InitHandler() {
-	// ports, err := freeport.GetFreePorts(6)
-	// if err != nil {
-	// 	zap.L().Error("无法获得足够数量的端口！错误信息：" + err.Error())
-	// }
-	global.Wg.Add(8)
 
-	// Feed服务
+	global.Wg.Add(2)
+
+	// Video服务
 	go func() {
 		s := grpc.NewServer()
-		pb.RegisterFeedServer(s, &handler.Feedserver{})
-		service(s, global.GlobalConfig.GRPC.FeedPort, "Feed")
-	}()
-
-	// PublishAction服务
-	go func() {
-		s := grpc.NewServer(grpc.MaxRecvMsgSize(1024*1024*global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB), grpc.MaxSendMsgSize(1024*1024*global.GlobalConfig.GRPC.GRPCMsgSize.LargeMB))
-		pb.RegisterPublishActionServer(s, &handler.Publishactionserver{})
-		service(s, global.GlobalConfig.GRPC.PublishActionPort, "PublishAction")
-	}()
-
-	// PublishList服务
-	go func() {
-		s := grpc.NewServer()
-		pb.RegisterPublishListServer(s, &handler.Publishlistserver{})
-		service(s, global.GlobalConfig.GRPC.PublishListPort, "PublishList")
-	}()
-
-	// UserInfo服务
-	go func() {
-		s := grpc.NewServer()
-		pb.RegisterUserInfoServer(s, &handler.Userinfoserver{})
-		service(s, global.GlobalConfig.GRPC.UserInfoPort, "UserInfo")
-	}()
-
-	// UserLogin服务
-	go func() {
-		s := grpc.NewServer()
-		pb.RegisterUserLoginServer(s, &handler.Userloginserver{})
-		service(s, global.GlobalConfig.GRPC.UserLoginPort, "UserLogin")
-	}()
-
-	// UserRegister服务
-	go func() {
-		s := grpc.NewServer()
-		pb.RegisterUserRegisterServer(s, &handler.Userregisterserver{})
-		service(s, global.GlobalConfig.GRPC.UserRegisterPort, "UserRegister")
-	}()
-
-	// VideoInfo服务
-	go func() {
-		s := grpc.NewServer()
-		pb.RegisterVideoInfoServer(s, &handler.VideoInfoserver{})
-		service(s, global.GlobalConfig.GRPC.VideoInfoPort, "VideoInfo")
+		pb.RegisterVideoServiceServer(s, &handler.Videoserver{})
+		service(s, global.GlobalConfig.GRPC.Port, "video-srv")
 	}()
 
 	go rabbitmq.ConsumeSimple()

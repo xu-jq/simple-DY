@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-03 14:34:50
+ * @LastEditTime: 2023-02-05 19:24:12
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userlogin.go
  * @Description: UserLogin服务
  */
@@ -16,11 +16,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type Userloginserver struct {
-	pb.UnimplementedUserLoginServer
-}
-
-func (s *Userloginserver) UserLogin(ctx context.Context, in *pb.DouyinUserLoginRequest) (*pb.DouyinUserLoginResponse, error) {
+func (s *Videoserver) UserLogin(ctx context.Context, in *pb.DouyinUserLoginRequest) (*pb.DouyinUserLoginResponse, error) {
 
 	// 构建返回的响应
 	userLoginResponse := pb.DouyinUserLoginResponse{}

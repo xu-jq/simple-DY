@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-29 09:50:40
+ * @LastEditTime: 2023-02-05 19:22:35
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/feed.go
  * @Description: Feed服务
  */
@@ -17,11 +17,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type Feedserver struct {
-	pb.UnimplementedFeedServer
-}
-
-func (s *Feedserver) Feed(ctx context.Context, in *pb.DouyinFeedRequest) (*pb.DouyinFeedResponse, error) {
+func (s *Videoserver) Feed(ctx context.Context, in *pb.DouyinFeedRequest) (*pb.DouyinFeedResponse, error) {
 
 	// 从数据库中获取指定条件的视频
 	result, latestTimeStamp := dao.GetFeedVideos(in.LatestTime, 30)

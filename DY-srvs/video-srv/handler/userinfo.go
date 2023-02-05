@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-29 10:00:19
+ * @LastEditTime: 2023-02-05 19:24:06
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/userinfo.go
  * @Description: UserInfo服务
  */
@@ -15,11 +15,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type Userinfoserver struct {
-	pb.UnimplementedUserInfoServer
-}
-
-func (s *Userinfoserver) UserInfo(ctx context.Context, in *pb.DouyinUserRequest) (*pb.DouyinUserResponse, error) {
+func (s *Videoserver) UserInfo(ctx context.Context, in *pb.DouyinUserRequest) (*pb.DouyinUserResponse, error) {
 
 	// 构建返回的响应
 	userResponse := pb.DouyinUserResponse{}

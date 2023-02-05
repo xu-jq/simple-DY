@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-03 15:41:40
+ * @LastEditTime: 2023-02-05 19:23:49
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/publishaction.go
  * @Description: PublishAction服务
  */
@@ -24,11 +24,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type Publishactionserver struct {
-	pb.UnimplementedPublishActionServer
-}
-
-func (s *Publishactionserver) PublishAction(ctx context.Context, in *pb.DouyinPublishActionRequest) (*pb.DouyinPublishActionResponse, error) {
+func (s *Videoserver) PublishAction(ctx context.Context, in *pb.DouyinPublishActionRequest) (*pb.DouyinPublishActionResponse, error) {
 
 	// 构建返回的响应
 	publishActionResponse := pb.DouyinPublishActionResponse{}

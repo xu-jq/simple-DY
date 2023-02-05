@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-03 15:06:56
+ * @LastEditTime: 2023-02-05 19:15:30
  * @FilePath: /simple-DY/DY-api/video-web/api/userinfo.go
  * @Description: 1.3.1 用户信息
  */
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/models"
-	videopb "simple-DY/DY-api/video-web/proto/video"
+	pb "simple-DY/DY-api/video-web/proto"
 	"strconv"
 	"time"
 
@@ -53,7 +53,7 @@ func UserInfo(c *gin.Context) {
 	zap.L().Info("返回响应成功！")
 }
 
-func douyinUser(user_id string) (responseUserInfo *videopb.DouyinUserResponse, err error) {
+func douyinUser(user_id string) (responseUserInfo *pb.DouyinUserResponse, err error) {
 	// 将接收的客户端请求参数绑定到结构体上
 	userId, err := strconv.ParseInt(user_id, 10, 64)
 	if err != nil {
@@ -75,7 +75,7 @@ func douyinUser(user_id string) (responseUserInfo *videopb.DouyinUserResponse, e
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
-	responseUserInfo, err = global.UserInfoSrvClient.UserInfo(ctx, &videopb.DouyinUserRequest{
+	responseUserInfo, err = global.VideoServiceClient.UserInfo(ctx, &pb.DouyinUserRequest{
 		UserId: userRequest.UserId,
 	})
 	zap.L().Info("通过GRPC接收到的响应：" + responseUserInfo.String())

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 14:46:54
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-05 14:28:57
+ * @LastEditTime: 2023-02-05 19:24:28
  * @FilePath: /simple-DY/DY-srvs/video-srv/handler/videoinfo.go
  * @Description: PublishAction服务
  */
@@ -17,11 +17,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type VideoInfoserver struct {
-	pb.UnimplementedVideoInfoServer
-}
-
-func (s *VideoInfoserver) VideoInfo(ctx context.Context, in *pb.DouyinVideoInfoRequest) (*pb.DouyinVideoInfoResponse, error) {
+func (s *Videoserver) VideoInfo(ctx context.Context, in *pb.DouyinVideoInfoRequest) (*pb.DouyinVideoInfoResponse, error) {
 
 	// 构建返回的响应
 	videoInfoResponse := pb.DouyinVideoInfoResponse{}

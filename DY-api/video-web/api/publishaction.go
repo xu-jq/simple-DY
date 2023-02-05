@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-03 10:26:42
+ * @LastEditTime: 2023-02-05 19:14:47
  * @FilePath: /simple-DY/DY-api/video-web/api/publishaction.go
  * @Description: 1.2.2 投稿接口
  */
@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/models"
-	videopb "simple-DY/DY-api/video-web/proto/video"
+	pb "simple-DY/DY-api/video-web/proto"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +47,7 @@ func PublishAction(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.FileSecond))
 	defer cancel()
 
-	responsePublishAction, err := global.PublishActionSrvClient.PublishAction(ctx, &videopb.DouyinPublishActionRequest{
+	responsePublishAction, err := global.VideoServiceClient.PublishAction(ctx, &pb.DouyinPublishActionRequest{
 		Data:  publishActionRequest.Data,
 		Token: publishActionRequest.Token,
 		Title: publishActionRequest.Title,

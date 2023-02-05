@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-03 16:32:47
+ * @LastEditTime: 2023-02-05 19:15:13
  * @FilePath: /simple-DY/DY-api/video-web/api/publishlist.go
  * @Description: 1.2.1 视频发布列表
  */
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/models"
-	videopb "simple-DY/DY-api/video-web/proto/video"
+	pb "simple-DY/DY-api/video-web/proto"
 	"strconv"
 	"sync"
 	"time"
@@ -88,7 +88,7 @@ func PublishList(c *gin.Context) {
 	zap.L().Info("返回响应成功！")
 }
 
-func douyinPublishList(user_id string) (responsePublishList *videopb.DouyinPublishListResponse, err error) {
+func douyinPublishList(user_id string) (responsePublishList *pb.DouyinPublishListResponse, err error) {
 	// 将接收的客户端请求参数绑定到结构体上
 	userId, err := strconv.ParseInt(user_id, 10, 64)
 	if err != nil {
@@ -109,7 +109,7 @@ func douyinPublishList(user_id string) (responsePublishList *videopb.DouyinPubli
 	// 将接收到的请求通过GRPC转发给服务端并接收响应
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
-	responsePublishList, err = global.PublishListSrvClient.PublishList(ctx, &videopb.DouyinPublishListRequest{
+	responsePublishList, err = global.VideoServiceClient.PublishList(ctx, &pb.DouyinPublishListRequest{
 		UserId: publishListRequest.UserId,
 	})
 	zap.L().Info("通过GRPC接收到的响应：" + responsePublishList.String())

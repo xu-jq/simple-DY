@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-21 10:01:21
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-03 10:27:55
+ * @LastEditTime: 2023-02-05 19:16:11
  * @FilePath: /simple-DY/DY-api/video-web/api/userregister.go
  * @Description: 1.3.2 用户注册
  */
@@ -13,7 +13,7 @@ import (
 	"simple-DY/DY-api/video-web/global"
 	"simple-DY/DY-api/video-web/middlewares"
 	"simple-DY/DY-api/video-web/models"
-	videopb "simple-DY/DY-api/video-web/proto/video"
+	pb "simple-DY/DY-api/video-web/proto"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -40,7 +40,7 @@ func UserRegister(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(global.GlobalConfig.GRPC.GRPCTimeOut.CommonSecond))
 	defer cancel()
 
-	responseUserRegister, err := global.UserRegisterSrvClient.UserRegister(ctx, &videopb.DouyinUserRegisterRequest{
+	responseUserRegister, err := global.VideoServiceClient.UserRegister(ctx, &pb.DouyinUserRegisterRequest{
 		Username: userRegisterRequest.UserName,
 		Password: userRegisterRequest.Password,
 	})

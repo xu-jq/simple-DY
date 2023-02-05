@@ -1,14 +1,13 @@
 /*
  * @Date: 2023-02-02 18:44:40
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 19:22:44
+ * @LastEditTime: 2023-02-05 19:13:24
  * @FilePath: /simple-DY/DY-api/video-web/api/info.go
  * @Description: 工具api
  */
 package api
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -72,21 +71,41 @@ func userService(c *gin.Context, idString string) (id, followCount, followerCoun
 	return
 }
 
-func videoService(c *gin.Context, idString string) (favoriteCount, commentCount int64, isFavorite bool) {
+func videoService(c *gin.Context, videoIdString string) (favoriteCount, commentCount int64, isFavorite bool) {
 	var wgVideo sync.WaitGroup
+	myId, success := c.Get("TokenId")
+	if !success {
+		zap.L().Error("无法获取用户的TokenId！")
+		return
+	}
 	// 并行查询服务
 	wgVideo.Add(2)
 	go func() {
 		defer wgVideo.Done()
-		myId, success := c.Get("TokenId")
-		if !success {
-			zap.L().Error("无法获取用户的TokenId！")
+		// douyinCommentList
+		myToken := c.Query("token")
+		responseCommentList, err := douyinCommentList(videoIdString, myToken)
+		if err != nil {
+			zap.L().Error("douyinCommentList GRPC失败！错误信息：" + err.Error())
 			return
 		}
-		fmt.Println(myId)
+		commentCount = int64(len(responseCommentList.CommentList))
 	}()
 	go func() {
 		defer wgVideo.Done()
+		// douyinLikeVideo
+		responseLikeVideo, err := douyinLikeVideo(videoIdString)
+		if err != nil {
+			zap.L().Error("douyinLikeVideo GRPC失败！错误信息：" + err.Error())
+			return
+		}
+		favoriteCount = int64(len(responseLikeVideo.UserId))
+		// 遍历列表进行查找
+		for _, user := range responseLikeVideo.UserId {
+			if user == myId {
+				isFavorite = true
+			}
+		}
 	}()
 	wgVideo.Wait()
 	return
