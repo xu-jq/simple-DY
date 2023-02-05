@@ -49,7 +49,7 @@ func (s *SocialServer) GetFollowerList(c context.Context, req *proto.FollowerLis
 	zap.S().Info("GetFollowList Running")
 	var follows []model.FollowsAndUser
 	result := global.DB.Raw("SELECT users.name,follows.user_id,follows.follower_id "+
-		"FROM users LEFT JOIN follows ON follows.user_id = users.id where users.id = ?", req.UserId).
+		"FROM follows LEFT JOIN users ON follows.follower_id = users.id where user_id = ?", req.UserId).
 		Find(&follows)
 	if result.Error != nil {
 		zap.S().Error("GetFollowList出错：", result.Error)
@@ -58,12 +58,9 @@ func (s *SocialServer) GetFollowerList(c context.Context, req *proto.FollowerLis
 	zap.S().Info(result)
 	resp := &proto.FollowerListResponse{}
 	for _, v := range follows {
-		resp.UserList = append(resp.GetUserList(), &proto.User{
-			Id:            v.ID,
-			Name:          v.Name,
-			FollowCount:   int64(len(follows)),
-			FollowerCount: 10,
-			IsFollow:      true,
+		resp.UserList = append(resp.UserList, &proto.User{
+			Id:   v.ID,
+			Name: v.Name,
 		})
 	}
 	return resp, nil
@@ -71,17 +68,24 @@ func (s *SocialServer) GetFollowerList(c context.Context, req *proto.FollowerLis
 
 // GetFriendList 用户好友列表
 func (s *SocialServer) GetFriendList(c context.Context, req *proto.GetFriendListRequest) (*proto.GetFriendListResponse, error) {
-	return &proto.GetFriendListResponse{
-		UserList: []*proto.User{
-			{
-				Id:            1,
-				Name:          "wanghui",
-				FollowCount:   10,
-				FollowerCount: 10,
-				IsFollow:      true,
-			},
-		},
-	}, nil
+	zap.S().Info("GetFollowList Running")
+	var follows []model.FollowsAndUser
+	result := global.DB.Raw("SELECT users.name,follows.user_id,follows.follower_id "+
+		"FROM follows LEFT JOIN users ON follows.follower_id = users.id where user_id = ?", req.UserId).
+		Find(&follows)
+	if result.Error != nil {
+		zap.S().Error("GetFollowList出错：", result.Error)
+		return nil, result.Error
+	}
+	zap.S().Info(result)
+	resp := &proto.GetFriendListResponse{}
+	for _, v := range follows {
+		resp.UserList = append(resp.UserList, &proto.User{
+			Id:   v.ID,
+			Name: v.Name,
+		})
+	}
+	return resp, nil
 }
 
 // RelationAction 取关和关注

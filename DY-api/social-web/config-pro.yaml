@@ -14,4 +14,4 @@ consul:
   port: 8500
 
 jwt:
-  key: ''
+  key: 'pkNbjcn4C5g'

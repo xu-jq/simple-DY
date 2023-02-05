@@ -8,19 +8,20 @@
 package router
 
 import (
-	"simple-DY/DY-api/social-web/api"
-
 	"github.com/gin-gonic/gin"
+	"simple-DY/DY-api/social-web/api"
+	"simple-DY/DY-api/social-web/middlewares"
 )
 
 func InitRelationRouter(Router *gin.RouterGroup) {
 	relationRouter := Router.Group("/relation")
+
 	{
-		relationRouter.GET("/follow/list", api.GetFollowList)
-		relationRouter.GET("/follower/list", api.GetFollowerList)
+		relationRouter.GET("/follow/list", middlewares.JWTAuth(), api.GetFollowList)
+		relationRouter.GET("/follower/list", middlewares.JWTAuth(), api.GetFollowerList)
 		// friend 就是关注的用户
-		relationRouter.GET("/friend/list", api.GetFollowerList)
-		relationRouter.POST("/action", api.RelationAction)
+		relationRouter.GET("/friend/list", middlewares.JWTAuth(), api.GetFollowerList)
+		relationRouter.POST("/action/", middlewares.JWTAuth(), api.RelationAction)
 
 	}
 }

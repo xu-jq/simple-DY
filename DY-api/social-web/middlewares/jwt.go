@@ -1,19 +1,35 @@
+/*
+ * @Date: 2023-01-28 20:53:39
+ * @LastEditors: zhang zhao
+ * @LastEditTime: 2023-02-02 16:26:31
+ * @FilePath: /simple-DY/DY-api/video-web/middlewares/jwt.go
+ * @Description: JWT中间件
+ */
 package middlewares
 
 import (
 	"errors"
+	"net/http"
+	"simple-DY/DY-api/social-web/models"
+	"simple-DY/DY-srvs/video-srv/global"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"simple-DY/DY-api/social-web/global"
-	"simple-DY/DY-api/social-web/models"
-	"time"
+	"go.uber.org/zap"
 )
 
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 获取token
+		// 我们这里jwt鉴权取头部信息 x-token 登录时回返回token信息 这里前端需要把token存储到cookie或者本地localSstorage中 不过需要跟后端协商过期时间 可以约定刷新令牌或者重新登录
+		// token不知道怎么取，都是直接放在请求里面的，就Get和Post都试一下吧
 		token := c.Query("token")
+		if token == "" {
+			token = c.PostForm("token")
+		}
+		zap.S().Info(token)
 		if token == "" {
 			c.JSON(http.StatusUnauthorized, map[string]string{
 				"msg": "请登录",
@@ -23,8 +39,9 @@ func JWTAuth() gin.HandlerFunc {
 		}
 		j := NewJWT()
 		// parseToken 解析token包含的信息
-		claims, err := j.ParseToken(token)
+		claims, err := j.ParseToken(strings.Fields(token)[1])
 		if err != nil {
+			zap.S().Info(token)
 			if err == TokenExpired {
 				if err == TokenExpired {
 					c.JSON(http.StatusUnauthorized, map[string]string{
@@ -35,12 +52,12 @@ func JWTAuth() gin.HandlerFunc {
 				}
 			}
 
-			c.JSON(http.StatusUnauthorized, "未登陆")
+			c.JSON(http.StatusUnauthorized, "未登录")
 			c.Abort()
 			return
 		}
 		c.Set("claims", claims)
-		c.Set("userId", claims.ID)
+		c.Set("TokenId", claims.Id)
 		c.Next()
 	}
 }
@@ -58,17 +75,17 @@ var (
 
 func NewJWT() *JWT {
 	return &JWT{
-		[]byte(global.ServerConfig.JWTInfo.SigningKey), //可以设置过期时间
+		[]byte(global.GlobalConfig.JWT.Secret), //可以设置过期时间
 	}
 }
 
-// CreateToken 创建一个token
+// 创建一个token
 func (j *JWT) CreateToken(claims models.CustomClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.SigningKey)
 }
 
-// ParseToken 解析 token
+// 解析 token
 func (j *JWT) ParseToken(tokenString string) (*models.CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &models.CustomClaims{}, func(token *jwt.Token) (i interface{}, e error) {
 		return j.SigningKey, nil
@@ -100,7 +117,7 @@ func (j *JWT) ParseToken(tokenString string) (*models.CustomClaims, error) {
 
 }
 
-// RefreshToken 更新token
+// 更新token
 func (j *JWT) RefreshToken(tokenString string) (string, error) {
 	jwt.TimeFunc = func() time.Time {
 		return time.Unix(0, 0)
@@ -117,4 +134,35 @@ func (j *JWT) RefreshToken(tokenString string) (string, error) {
 		return j.CreateToken(*claims)
 	}
 	return "", TokenInvalid
+}
+
+func GenerateToken(id int64) string {
+	zap.L().Info("开始产生Token...")
+
+	// 设置Token过期时间
+	expiresTime := time.Now().Unix() + global.GlobalConfig.JWT.TokenExpiresTime
+	zap.L().Info("Token将于" + time.Unix(expiresTime, 0).Format(global.GlobalConfig.Time.TimeFormat) + "过期")
+
+	// 声明
+	claims := jwt.StandardClaims{
+		ExpiresAt: expiresTime,
+		Id:        strconv.FormatInt(id, 10),
+		IssuedAt:  time.Now().Unix(),
+		Issuer:    "simple-dy",
+		NotBefore: time.Now().Unix(),
+		Subject:   "token",
+	}
+
+	// 生成Token
+	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token, err := tokenClaims.SignedString([]byte(global.GlobalConfig.JWT.Secret))
+
+	// 判断生成Token是否成功
+	if err != nil {
+		zap.L().Error("生成Token失败！错误信息：" + err.Error())
+	} else {
+		token = "Bearer " + token
+		zap.L().Info("生成Token成功！")
+	}
+	return token
 }

@@ -9,27 +9,22 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
-	"simple-DY/DY-api/social-web/forms"
 	"simple-DY/DY-api/social-web/global"
 	"simple-DY/DY-api/social-web/proto"
 	"strconv"
 )
 
 func RelationAction(ctx *gin.Context) {
+	zap.S().Info("-------RelationAction-------")
 	// auth中间件解析后，将userId存入ctx中。
-	userId, _ := ctx.Get("user_id")
-
-	// 验证表单
-	reqForm := forms.RelationActionReq{}
-	if err := ctx.ShouldBindJSON(&reqForm); err != nil {
-		HandleValidatorError(ctx, err)
-		return
-	}
-	zap.S().Info("接受的参数：", reqForm)
+	userId, _ := ctx.Get("TokenId")
+	toUserId, _ := strconv.ParseInt(ctx.Query("to_user_id"), 10, 64)
+	actionType, _ := strconv.ParseInt(ctx.Query("action_type"), 10, 64)
+	zap.S().Info("接受的参数：", userId, toUserId, actionType)
 	_, err := global.SocialSrvClient.RelationAction(ctx, &proto.RelationActionRequest{
 		UserId:     userId.(int64),
-		ToUserId:   reqForm.ToUserID,
-		ActionType: reqForm.ActionType,
+		ToUserId:   toUserId,
+		ActionType: int32(actionType),
 	})
 	if err != nil {
 		zap.S().Error("RelationAction：", err)
@@ -44,7 +39,7 @@ func RelationAction(ctx *gin.Context) {
 
 func GetFollowList(ctx *gin.Context) {
 	zap.S().Info("-------GetFollowList-------")
-	userID := ctx.DefaultQuery("user_id", "0")
+	userID := ctx.Query("user_id")
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 		return
@@ -63,6 +58,7 @@ func GetFollowList(ctx *gin.Context) {
 	for _, v := range list.UserList {
 		userList = append(userList, v)
 	}
+	zap.S().Error("GetFollowList：", userList)
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": 0,
 		"status_msg":  "执行成功",
@@ -72,7 +68,7 @@ func GetFollowList(ctx *gin.Context) {
 
 func GetFollowerList(ctx *gin.Context) {
 	zap.S().Info("-------GetFollowerList-------")
-	userID := ctx.DefaultQuery("user_id", "0")
+	userID := ctx.Query("user_id")
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 		return
@@ -89,7 +85,7 @@ func GetFollowerList(ctx *gin.Context) {
 		return
 	}
 	for _, v := range list.UserList {
-		userList = append(userList, v.Id)
+		userList = append(userList, v)
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": 0,
@@ -99,7 +95,7 @@ func GetFollowerList(ctx *gin.Context) {
 }
 
 func GetFriendList(ctx *gin.Context) {
-	userID := ctx.DefaultQuery("user_id", "0")
+	userID := ctx.Query("user_id")
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 		return
