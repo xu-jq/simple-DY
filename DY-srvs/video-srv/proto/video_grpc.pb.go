@@ -533,3 +533,89 @@ var UserLogin_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "video.proto",
 }
+
+// VideoInfoClient is the client API for VideoInfo service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type VideoInfoClient interface {
+	VideoInfo(ctx context.Context, in *DouyinVideoInfoRequest, opts ...grpc.CallOption) (*DouyinVideoInfoResponse, error)
+}
+
+type videoInfoClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewVideoInfoClient(cc grpc.ClientConnInterface) VideoInfoClient {
+	return &videoInfoClient{cc}
+}
+
+func (c *videoInfoClient) VideoInfo(ctx context.Context, in *DouyinVideoInfoRequest, opts ...grpc.CallOption) (*DouyinVideoInfoResponse, error) {
+	out := new(DouyinVideoInfoResponse)
+	err := c.cc.Invoke(ctx, "/proto.VideoInfo/VideoInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// VideoInfoServer is the server API for VideoInfo service.
+// All implementations must embed UnimplementedVideoInfoServer
+// for forward compatibility
+type VideoInfoServer interface {
+	VideoInfo(context.Context, *DouyinVideoInfoRequest) (*DouyinVideoInfoResponse, error)
+	mustEmbedUnimplementedVideoInfoServer()
+}
+
+// UnimplementedVideoInfoServer must be embedded to have forward compatible implementations.
+type UnimplementedVideoInfoServer struct {
+}
+
+func (UnimplementedVideoInfoServer) VideoInfo(context.Context, *DouyinVideoInfoRequest) (*DouyinVideoInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VideoInfo not implemented")
+}
+func (UnimplementedVideoInfoServer) mustEmbedUnimplementedVideoInfoServer() {}
+
+// UnsafeVideoInfoServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to VideoInfoServer will
+// result in compilation errors.
+type UnsafeVideoInfoServer interface {
+	mustEmbedUnimplementedVideoInfoServer()
+}
+
+func RegisterVideoInfoServer(s grpc.ServiceRegistrar, srv VideoInfoServer) {
+	s.RegisterService(&VideoInfo_ServiceDesc, srv)
+}
+
+func _VideoInfo_VideoInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DouyinVideoInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoInfoServer).VideoInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.VideoInfo/VideoInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoInfoServer).VideoInfo(ctx, req.(*DouyinVideoInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// VideoInfo_ServiceDesc is the grpc.ServiceDesc for VideoInfo service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var VideoInfo_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.VideoInfo",
+	HandlerType: (*VideoInfoServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "VideoInfo",
+			Handler:    _VideoInfo_VideoInfo_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "video.proto",
+}

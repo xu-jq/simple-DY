@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 22:05:18
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-03 10:22:18
+ * @LastEditTime: 2023-02-05 14:20:11
  * @FilePath: /simple-DY/DY-srvs/video-srv/proto/video.proto
  * @Description: protobuf定义
  */
@@ -136,4 +136,20 @@ message douyin_user_login_response{
     string status_msg = 2; // 返回状态描述​
     int64 user_id = 3; // 用户id​
     string token = 4; // 用户鉴权token​
+}
+
+
+// xu junqi接口：根据视频id返回视频信息
+service VideoInfo {
+    rpc VideoInfo (douyin_video_info_request) returns (douyin_video_info_response) {}
+}
+
+message douyin_video_info_request{
+    int64 video_id = 1; // 视频id
+}
+
+message douyin_video_info_response{
+    int32 status_code = 1; // 状态码，0-成功，其他值-失败​
+    string status_msg = 2; // 返回状态描述​
+    Video video_list = 3; // 视频信息
 }

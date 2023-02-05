@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-25 22:47:19
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-01-26 17:37:38
+ * @LastEditTime: 2023-02-05 14:29:57
  * @FilePath: /simple-DY/DY-srvs/video-srv/utils/dao/videodao.go
  * @Description: videos表操作
  */
@@ -73,4 +73,19 @@ func GetFeedVideos(inputTime int64, num int) (result []map[string]interface{}, l
 		latestTimeStamp["t"] = time.Now().Unix()
 	}
 	return
+}
+
+/**
+ * @description: 通过id获取Videos表的信息,由于id一定是唯一的，因此只有查找到和没有查找到两种情况，不会出现查询出多个的情况
+ * @param {int64} id
+ * @return {models.Videos} video
+ */
+func GetVideoById(id int64) models.Videos {
+	// 数据库查询和更新的模板
+	video := models.Videos{}
+
+	// 根据id查找数据库中的视频信息
+	global.DB.Where("id = ?", id).Find(&video)
+
+	return video
 }

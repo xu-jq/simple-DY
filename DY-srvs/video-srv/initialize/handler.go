@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-20 19:05:40
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-04 11:23:26
+ * @LastEditTime: 2023-02-05 14:30:36
  * @FilePath: /simple-DY/DY-srvs/video-srv/initialize/handler.go
  * @Description: 初始化服务协程
  */
@@ -27,7 +27,7 @@ func InitHandler() {
 	// if err != nil {
 	// 	zap.L().Error("无法获得足够数量的端口！错误信息：" + err.Error())
 	// }
-	global.Wg.Add(7)
+	global.Wg.Add(8)
 
 	// Feed服务
 	go func() {
@@ -69,6 +69,13 @@ func InitHandler() {
 		s := grpc.NewServer()
 		pb.RegisterUserRegisterServer(s, &handler.Userregisterserver{})
 		service(s, global.GlobalConfig.GRPC.UserRegisterPort, "UserRegister")
+	}()
+
+	// VideoInfo服务
+	go func() {
+		s := grpc.NewServer()
+		pb.RegisterVideoInfoServer(s, &handler.VideoInfoserver{})
+		service(s, global.GlobalConfig.GRPC.VideoInfoPort, "VideoInfo")
 	}()
 
 	go rabbitmq.ConsumeSimple()
