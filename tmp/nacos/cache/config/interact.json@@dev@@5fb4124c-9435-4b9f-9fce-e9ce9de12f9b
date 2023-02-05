@@ -1,0 +1,16 @@
+{
+    "name":"interact-srv",
+    "host":"192.168.0.106",
+    "tags":["DY-srv","interact"],
+    "mysql":{
+        "host":"121.37.98.68",
+        "port": 3306,
+        "user": "dymysql",
+        "password": "gxnw21XxRhY",
+        "db":"simpledy"
+    },
+    "consul":{
+        "host":"8.134.157.141",
+        "port":8500
+    }
+}

@@ -28,6 +28,8 @@ func main() {
 	initalize.InitConfig()
 	initalize.InitDB()
 	initalize.InitRedis()
+	initalize.InitSocialSrvConn()
+	initalize.InitVideoSrvConn()
 
 	flag.Parse()
 	zap.S().Info("ip: ", *IP)

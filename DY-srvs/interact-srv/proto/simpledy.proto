@@ -1,0 +1,257 @@
+syntax = "proto3";
+
+option go_package = ".;proto";
+
+service VideoService {
+    rpc Feed (douyin_feed_request) returns (douyin_feed_response);
+    rpc PublishList (douyin_publish_list_request) returns (douyin_publish_list_response);
+    rpc PublishAction (douyin_publish_action_request) returns (douyin_publish_action_response);
+    rpc UserInfo (douyin_user_request) returns (douyin_user_response);
+    rpc UserLogin (douyin_user_login_request) returns (douyin_user_login_response);
+    rpc UserRegister (douyin_user_register_request) returns (douyin_user_register_response);
+    rpc VideoInfo (douyin_video_info_request) returns (douyin_video_info_response);
+}
+
+service SocialService{
+    rpc GetFollowList(GetFollowListRequest) returns (GetFollowListResponse);
+    rpc GetFollowerList(FollowerListRequest) returns (FollowerListResponse);
+    rpc GetFriendList(GetFriendListRequest) returns (GetFriendListResponse);
+    rpc RelationAction(RelationActionRequest) returns (RelationActionResponse);
+    rpc MsgChat(MsgChatRequest) returns (MsgChatResponse);
+    rpc MsgAction(MsgActionRequest) returns (MsgActionResponse);
+}
+
+service InteractService{
+    rpc FavoriteAction(douyin_favorite_action_request) returns (douyin_favorite_action_response);
+    rpc GetFavoriteList(douyin_favorite_list_request) returns (douyin_favorite_list_response);
+    rpc CommentAction(douyin_comment_action_request) returns (douyin_comment_action_response);
+    rpc GetCommentList(douyin_comment_list_request) returns (douyin_comment_list_response);
+    rpc GetLikeVideoUserId(douyin_like_video_request) returns (douyin_like_video_response);
+}
+
+message Video{
+    int64 id = 1; // 视频唯一标识​
+    User author = 2; // 视频作者信息​
+    string play_url = 3; // 视频播放地址​
+    string cover_url = 4; // 视频封面地址​
+    int64 favorite_count = 5; // 视频的点赞总数​
+    int64 comment_count = 6; // 视频的评论总数​
+    bool is_favorite = 7; // true-已点赞，false-未点赞​
+    string title = 8; // 视频标题​
+}
+
+message User{
+    int64 id = 1; // 用户id​
+    string name = 2; // 用户名称​
+    int64 follow_count = 3; // 关注总数​
+    int64 follower_count = 4; // 粉丝总数​
+    bool is_follow = 5; // true-已关注，false-未关注​
+}
+
+message Comment {
+    int64 id = 1; // 视频评论id
+    User user =2; // 评论用户信息
+    string content = 3; // 评论内容
+    string create_date = 4; // 评论发布日期，格式 mm-dd
+}
+
+// 1.1 视频流接口
+
+message douyin_feed_request{
+    int64 latest_time = 1; // 可选参数，限制返回视频的最新投稿时间戳，精确到秒，不填表示当前时间​
+    string token = 2;  // 可选参数，登录用户设置​
+}
+
+message douyin_feed_response{
+    int32 status_code = 1; // 状态码，0-成功，其他值-失败​
+    string status_msg = 2; // 返回状态描述​
+    repeated Video video_list = 3; // 视频列表​
+    int64 next_time = 4; // 本次返回的视频中，发布最早的时间，作为下次请求时的latest_time​
+}
+
+// 1.2.1 视频发布列表
+
+message douyin_publish_list_request{
+    int64 user_id = 1; // 用户id​
+    string token = 2; // 用户鉴权token​
+}
+
+message douyin_publish_list_response{
+    int32 status_code = 1; // 状态码，0-成功，其他值-失败​
+    string status_msg = 2; // 返回状态描述​
+    repeated Video video_list = 3; // 用户发布的视频列表​
+}
+
+// 1.2.2 投稿接口
+
+message douyin_publish_action_request{
+    string token = 1; // 用户鉴权token​
+    bytes data = 2; // 视频数据
+    string title = 3; // 视频标题​
+}
+
+message douyin_publish_action_response{
+    int32 status_code = 1; // 状态码，0-成功，其他值-失败​
+    string status_msg = 2; // 返回状态描述​
+}
+
+// 1.3.1 用户信息
+
+message douyin_user_request{
+    int64 user_id = 1; // 用户id​
+    string token = 2; // 用户鉴权token​
+}
+
+message douyin_user_response{
+    int32 status_code = 1; // 状态码，0-成功，其他值-失败​
+    string status_msg = 2; // 返回状态描述​
+    User user = 3; // 用户信息​
+}
+
+
+
+// 1.3.2 用户注册
+
+message douyin_user_register_request{
+    string username = 1; // 注册用户名，最长32个字符​
+    string password = 2; // 密码，最长32个字符​
+}
+
+message douyin_user_register_response{
+    int32 status_code = 1; // 状态码，0-成功，其他值-失败​
+    string status_msg = 2; // 返回状态描述​
+    int64 user_id = 3; // 用户id​
+    string token = 4; // 用户鉴权token​
+}
+
+// 1.3.3 用户登录
+
+message douyin_user_login_request{
+    string username = 1; // 登录用户名​
+    string password = 2; // 登录密码​
+}
+
+message douyin_user_login_response{
+    int32 status_code = 1; // 状态码，0-成功，其他值-失败​
+    string status_msg = 2; // 返回状态描述​
+    int64 user_id = 3; // 用户id​
+    string token = 4; // 用户鉴权token​
+}
+
+// 根据video id返回视频信息
+message douyin_video_info_request{
+    int64 video_id = 1; // 视频id
+}
+
+message douyin_video_info_response{
+    int32 status_code = 1; // 状态码，0-成功，其他值-失败​
+    string status_msg = 2; // 返回状态描述​
+    Video video_list = 3; // 视频信息
+}
+
+
+message douyin_favorite_action_request {
+   string token = 1; // 用户鉴权token
+   int64 video_id = 2; // 视频id
+   int32 action_type = 3; // 1-点赞，2-取消点赞
+}
+
+message douyin_favorite_action_response {
+   int32 status_code = 1; // 状态码，0-成功，其他值-失败
+   string status_msg = 2; // 返回状态描述
+}
+
+message douyin_favorite_list_request {
+   int64 user_id = 1; // 用户id
+   string token = 2; // 用户鉴权token
+}
+
+message douyin_favorite_list_response {
+   int32 status_code = 1; // 状态码，0-成功，其他值-失败
+   string status_msg = 2; // 返回状态描述
+   repeated Video video_list = 3; // 用户点赞视频列表
+}
+
+message douyin_comment_action_request {
+   string token = 1; // 用户鉴权token
+   int64 video_id = 2; // 视频id
+   int32 action_type = 3; // 1-发布评论，2-删除评论
+   string comment_text = 4; // 用户填写的评论内容，在action_type=1的时候使用
+   int64 comment_id = 5; // 要删除的评论id，在action_type=2的时候使用
+}
+
+message douyin_comment_action_response {
+   int32 status_code = 1; // 状态码，0-成功，其他值-失败
+   string status_msg = 2; // 返回状态描述
+   Comment comment = 3; // 评论成功返回评论内容，不需要重新拉取整个列表
+}
+
+message douyin_comment_list_request {
+   string token = 1; // 用户鉴权token
+   int64 video_id = 2; // 视频id
+}
+
+message douyin_comment_list_response {
+   int32 status_code = 1; // 状态码，0-成功，其他值-失败
+   string status_msg = 2; // 返回状态描述
+   repeated Comment comment_list = 3; // 评论列表
+}
+
+message douyin_like_video_request{
+   int64 video_id = 1;// 视频id
+}
+
+message douyin_like_video_response{
+   int64 video_id = 1;// 视频id
+   repeated int64 user_id = 2;
+}
+
+ 
+message MsgActionRequest{
+   int64 user_id =1;
+   int64 to_user_id=2;
+   int32 action_type = 3;
+   string content = 4;
+}
+message MsgActionResponse{
+}
+message MsgChatRequest{
+   int64 user_id =1;
+   int64 to_user_id=2;
+ 
+}
+message MsgChatResponse{
+   repeated Msg message_list=1;
+}
+message Msg{
+   int64 id = 1;
+   string content = 2;
+   string create_time=3;
+}
+
+message RelationActionRequest{
+   int64 user_id =1;
+   int64 to_user_id=2;
+   int32 action_type=3;
+}
+message RelationActionResponse{
+ 
+}
+message GetFriendListRequest{
+   int64 user_id=1;
+}
+message GetFriendListResponse{
+   repeated User user_list = 1;
+}
+message GetFollowListRequest{
+   int64 user_id=1;
+}
+message GetFollowListResponse{
+   repeated User user_list = 1;
+}
+message FollowerListRequest{
+   int64 user_id=1;
+}
+message FollowerListResponse{
+   repeated User user_list = 1;
+}

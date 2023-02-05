@@ -9,14 +9,17 @@ import (
 	"log"
 	"os"
 	"simple-DY/DY-srvs/interact-srv/config"
+	"simple-DY/DY-srvs/interact-srv/proto"
 	"time"
 )
 
 var (
-	DB           *gorm.DB
-	RDB          *redis.Client
-	ServerConfig config.ServerConfig
-	NacosConfig  config.NacosConfig
+	DB              *gorm.DB
+	RDB             *redis.Client
+	ServerConfig    config.ServerConfig
+	NacosConfig     config.NacosConfig
+	SocialSrvClient proto.SocialServiceClient
+	VideoSrvClient  proto.VideoServiceClient
 )
 
 func init() {

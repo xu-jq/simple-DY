@@ -13,12 +13,22 @@ type ConsulConfig struct {
 	Port int    `mapstructure:"port" json:"port"`
 }
 
+type VideoSrvConfig struct {
+	Name string `mapstructure:"name" json:"name"`
+}
+
+type SocialSrvConfig struct {
+	Name string `mapstructure:"name" json:"name"`
+}
+
 type ServerConfig struct {
-	Name       string       `mapstructure:"name" json:"name"`
-	Tags       []string     `mapstructure:"tags" json:"tags"`
-	Host       string       `mapstructure:"host" json:"host"`
-	MysqlInfo  MysqlConfig  `mapstructure:"mysql" json:"mysql"`
-	ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
+	Name          string          `mapstructure:"name" json:"name"`
+	Tags          []string        `mapstructure:"tags" json:"tags"`
+	Host          string          `mapstructure:"host" json:"host"`
+	MysqlInfo     MysqlConfig     `mapstructure:"mysql" json:"mysql"`
+	ConsulInfo    ConsulConfig    `mapstructure:"consul" json:"consul"`
+	SocialSrvInfo SocialSrvConfig `mapstructure:"social_srv" json:"social_srv"`
+	VideoSrvInfo  VideoSrvConfig  `mapstructure:"video_srv" json:"video_srv"`
 }
 
 type NacosConfig struct {
