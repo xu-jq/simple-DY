@@ -28,7 +28,7 @@ func (g *GormList) Scan(value interface{}) error {
 }
 
 type BaseModel struct {
-	ID        int32          `gorm:"primarykey;type:int" json:"id"` // 为什么使用int32， bigint
+	ID        int32          `gorm:"primarykey;type:bigint" json:"id"` // 为什么使用int32， bigint
 	CreatedAt time.Time      `gorm:"column:add_time" json:"-"`
 	UpdatedAt time.Time      `gorm:"column:update_time" json:"-"`
 	DeletedAt gorm.DeletedAt `json:"-"`
@@ -36,13 +36,13 @@ type BaseModel struct {
 }
 
 type Follows struct {
-	ID         int64 `gorm:"primarykey;type:int" json:"id"`
+	ID         int64 `gorm:"primarykey;type:bigint" json:"id"`
 	UserID     int64 `gorm:"column:user_id" json:"UserID"`
 	FollowerID int64 `gorm:"column:follower_id" json:"FollowerID"`
 }
 
-type Message struct {
-	ID       int64     `gorm:"primarykey;type:int" json:"id"`
+type Messages struct {
+	ID       int64     `gorm:"primarykey;type:bigint" json:"id"`
 	UserID   int64     `gorm:"column:user_id" json:"user_id"`
 	ToUserID int64     `gorm:"column:to_user_id" json:"to_user_id"`
 	SentTime time.Time `gorm:"column:sent_time" json:"sent_time"`

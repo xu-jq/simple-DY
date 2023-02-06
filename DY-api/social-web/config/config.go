@@ -12,7 +12,7 @@ type SocialSrvInfo struct {
 
 type JWTConfig struct {
 	SigningKey       string `mapstructure:"key" json:"key"`
-	TokenExpiresTime int64  `mapstructuint"token_expires_time" json:"token_expires_time"`
+	TokenExpiresTime int64  `mapstructure:"token_expires_time" json:"token_expires_time"`
 }
 
 type ConsulConfig struct {

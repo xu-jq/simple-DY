@@ -17,13 +17,13 @@ import (
 
 func MsgChat(ctx *gin.Context) {
 	zap.S().Info("-------MsgChat-------")
-	userId := ctx.Query("user_id")
-	toUserID := ctx.DefaultQuery("to_user_id", "0")
+	userID, _ := ctx.Get("TokenId")
+	userId, _ := strconv.Atoi(userID.(string))
+	toUserID := ctx.Query("to_user_id")
 	id, _ := strconv.Atoi(toUserID)
-	zap.S().Info("接受的参数to_user_id：", id)
-	userid, _ := strconv.Atoi(userId)
+	zap.S().Infof("接受的参数userId:%d,toUserID:%d", userId, id)
 	msgChat, err := global.SocialSrvClient.MsgChat(ctx, &proto.MsgChatRequest{
-		UserId:   int64(userid),
+		UserId:   int64(userId),
 		ToUserId: int64(id),
 	})
 	if err != nil {
@@ -46,13 +46,14 @@ func MsgChat(ctx *gin.Context) {
 func MsgAction(ctx *gin.Context) {
 	zap.S().Info("-------MsgAction-------")
 	// 接受数据以及表单验证
-	userId, err1 := strconv.ParseInt(ctx.GetString("userId"), 10, 64)
+	userID, _ := ctx.Get("TokenId")
+	userId, _ := strconv.Atoi(userID.(string))
 	toUserId, err2 := strconv.ParseInt(ctx.Query("to_user_id"), 10, 64)
 	actionType, err3 := strconv.ParseInt(ctx.Query("action_type"), 10, 64)
-	content := ctx.Query("action_type")
+	content := ctx.Query("content")
 	// fmt.Println(userId, toUserId, actionType)
 	// 传入参数格式有问题。
-	if nil != err1 || nil != err2 || nil != err3 || actionType < 1 || actionType > 2 {
+	if nil != err2 || nil != err3 || actionType < 1 || actionType > 2 {
 		fmt.Printf("fail")
 		ctx.JSON(http.StatusOK, gin.H{
 			"status_code": -1,
@@ -62,7 +63,7 @@ func MsgAction(ctx *gin.Context) {
 	}
 	zap.S().Info("接受的参数：", userId, toUserId, actionType)
 	_, err := global.SocialSrvClient.MsgAction(ctx, &proto.MsgActionRequest{
-		UserId:     userId,
+		UserId:     int64(userId),
 		ToUserId:   toUserId,
 		ActionType: int32(actionType),
 		Content:    content,

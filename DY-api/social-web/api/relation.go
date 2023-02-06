@@ -18,11 +18,12 @@ func RelationAction(ctx *gin.Context) {
 	zap.S().Info("-------RelationAction-------")
 	// auth中间件解析后，将userId存入ctx中。
 	userId, _ := ctx.Get("TokenId")
+	id, _ := strconv.Atoi(userId.(string))
 	toUserId, _ := strconv.ParseInt(ctx.Query("to_user_id"), 10, 64)
 	actionType, _ := strconv.ParseInt(ctx.Query("action_type"), 10, 64)
 	zap.S().Info("接受的参数：", userId, toUserId, actionType)
 	_, err := global.SocialSrvClient.RelationAction(ctx, &proto.RelationActionRequest{
-		UserId:     userId.(int64),
+		UserId:     int64(id),
 		ToUserId:   toUserId,
 		ActionType: int32(actionType),
 	})
@@ -58,7 +59,6 @@ func GetFollowList(ctx *gin.Context) {
 	for _, v := range list.UserList {
 		userList = append(userList, v)
 	}
-	zap.S().Error("GetFollowList：", userList)
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": 0,
 		"status_msg":  "执行成功",

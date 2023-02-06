@@ -16,9 +16,9 @@ func main() {
 	// 1. 初始化操作
 	// 初始化配置文件
 	initialize.InitCfg()
-	zap.S().Info(global.ServerConfig)
 	// 初始化日志
 	initialize.InitLogger()
+	zap.S().Info("配置信息", global.ServerConfig)
 	// 初始化路由
 	Router := initialize.InitRouter()
 	// 初始化微服务连接

@@ -29,7 +29,6 @@ func JWTAuth() gin.HandlerFunc {
 		if token == "" {
 			token = c.PostForm("token")
 		}
-		zap.S().Info(token)
 		if token == "" {
 			c.JSON(http.StatusUnauthorized, map[string]string{
 				"msg": "请登录",
@@ -74,6 +73,7 @@ var (
 )
 
 func NewJWT() *JWT {
+	zap.S().Info(global.ServerConfig.JWTInfo.SigningKey)
 	return &JWT{
 		[]byte(global.ServerConfig.JWTInfo.SigningKey), //可以设置过期时间
 	}
@@ -87,7 +87,6 @@ func (j *JWT) CreateToken(claims models.CustomClaims) (string, error) {
 
 // 解析 token
 func (j *JWT) ParseToken(tokenString string) (*models.CustomClaims, error) {
-	zap.S().Info(tokenString)
 	token, err := jwt.ParseWithClaims(tokenString, &models.CustomClaims{}, func(token *jwt.Token) (i interface{}, e error) {
 		return j.SigningKey, nil
 	})

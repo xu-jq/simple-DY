@@ -45,6 +45,5 @@ func InitCfg() {
 		fmt.Println("config file changed:", in.Name)
 		_ = v.ReadInConfig()
 		_ = v.Unmarshal(global.ServerConfig)
-		zap.S().Infof("配置信息：%v", global.ServerConfig)
 	})
 }
