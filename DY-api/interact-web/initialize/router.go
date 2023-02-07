@@ -3,6 +3,7 @@ package initialize
 import (
 	"github.com/gin-gonic/gin"
 	"simple-DY/DY-api/interact-web/middlewares"
+	"simple-DY/DY-api/interact-web/router"
 
 	"net/http"
 )
@@ -20,5 +21,8 @@ func Routers() *gin.Engine {
 	//配置跨域
 	Router.Use(middlewares.Cors())
 	//添加链路追踪
+	group := Router.Group("/douyin")
+	router.InitLikeRouter(group)
+	router.InitCommentRouter(group)
 	return Router
 }
