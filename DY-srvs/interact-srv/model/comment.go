@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Comment struct {
 	Id          int64     `json:"id"`

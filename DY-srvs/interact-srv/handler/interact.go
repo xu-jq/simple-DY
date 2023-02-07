@@ -65,7 +65,6 @@ func (*InteractServer) GetFavoriteList(ctx context.Context, req *proto.DouyinFav
 			VideoList:  nil,
 		}, nil
 	}
-	// ToDo 调用服务，根据videoIds封装resp
 	var videos []*proto.Video
 	for _, videoId := range videoIds.Val() {
 		vid, _ := strconv.Atoi(videoId)
@@ -113,11 +112,25 @@ func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinComme
 		if err := global.DB.Create(&comment).Error; err != nil {
 			return nil, err
 		}
+		userInfo, _ := global.VideoSrvClient.UserInfo(context.Background(), &proto.DouyinUserRequest{
+			UserId: int64(uId),
+			Token:  req.Token,
+		})
 		resp := proto.DouyinCommentActionResponse{
 			StatusCode: 0,
 			StatusMsg:  "评论成功",
-			//ToDo 调用服务根据comment_id,封装comment结构体
-			Comment: nil,
+			Comment: &proto.Comment{
+				Id: comment.Id,
+				User: &proto.User{
+					Id:            userInfo.User.Id,
+					Name:          userInfo.User.Name,
+					FollowCount:   userInfo.User.FollowCount,
+					FollowerCount: userInfo.User.FollowerCount,
+					IsFollow:      userInfo.User.IsFollow,
+				},
+				Content:    comment.CommentText,
+				CreateDate: comment.CreateTime.Format("01-02"),
+			},
 		}
 		return &resp, nil
 	} else if actionType == 2 { //删除评论
@@ -134,7 +147,7 @@ func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinComme
 }
 
 func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinCommentListRequest) (*proto.DouyinCommentListResponse, error) {
-	var comments []model.Comment
+	var comments []*model.Comment
 	if res := global.DB.Where("video_id=?", req.VideoId).Find(&comments); res.RowsAffected == 0 {
 		resp := proto.DouyinCommentListResponse{
 			StatusCode:  0,
@@ -143,18 +156,36 @@ func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinComm
 		}
 		return &resp, nil
 	}
-	// ToDo 根据comments调用服务封装resp
-
+	var commonLists []*proto.Comment
+	for _, comment := range comments {
+		userInfo, _ := global.VideoSrvClient.UserInfo(context.Background(), &proto.DouyinUserRequest{
+			UserId: comment.UserId,
+			Token:  req.Token,
+		})
+		commonList := &proto.Comment{
+			Id: comment.VideoId,
+			User: &proto.User{
+				Id:            userInfo.User.Id,
+				Name:          userInfo.User.Name,
+				FollowCount:   userInfo.User.FollowCount,
+				FollowerCount: userInfo.User.FollowerCount,
+				IsFollow:      userInfo.User.IsFollow,
+			},
+			Content:    comment.CommentText,
+			CreateDate: comment.CreateTime.Format("01-02"),
+		}
+		commonLists = append(commonLists, commonList)
+	}
 	resp := proto.DouyinCommentListResponse{
 		StatusCode:  0,
 		StatusMsg:   "获取评论成功",
-		CommentList: nil,
+		CommentList: commonLists,
 	}
 	return &resp, nil
 }
 
 func (*InteractServer) GetLikeVideoUserId(ctx context.Context, req *proto.DouyinLikeVideoRequest) (*proto.DouyinLikeVideoResponse, error) {
-	var likes []model.Like
+	var likes []*model.Like
 	if res := global.DB.Where("video_id=?", req.VideoId).Find(&likes); res.RowsAffected == 0 {
 		return &proto.DouyinLikeVideoResponse{
 			VideoId: req.VideoId,
