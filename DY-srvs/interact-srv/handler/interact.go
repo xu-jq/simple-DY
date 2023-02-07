@@ -7,9 +7,10 @@ import (
 	"simple-DY/DY-srvs/interact-srv/global"
 	"simple-DY/DY-srvs/interact-srv/model"
 	"simple-DY/DY-srvs/interact-srv/proto"
-	myJwt "simple-DY/DY-srvs/interact-srv/utils/jwt"
 	"simple-DY/DY-srvs/interact-srv/utils/key"
+	"simple-DY/DY-srvs/video-srv/utils/jwt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -19,18 +20,17 @@ type InteractServer struct {
 
 func (*InteractServer) FavoriteAction(ctx context.Context, req *proto.DouyinFavoriteActionRequest) (*proto.DouyinFavoriteActionResponse, error) {
 	// 解析token得到user.id
-	claims, _ := myJwt.ParseToken(req.Token)
-	userId := claims.Id
+	tokenId, _ := jwt.ParseToken(strings.Fields(req.Token)[1])
+	userId, _ := strconv.ParseInt(tokenId.Id, 10, 64)
 	videoId := req.VideoId
 	actionType := req.ActionType
-	uId, _ := strconv.Atoi(userId)
 	myKey := key.KeyUserFavorite(userId)             // 点赞key
 	isMember := global.RDB.SIsMember(myKey, videoId) // 判断是否点赞
 	if actionType == 1 && isMember.Val() {           // 点赞操作
 		global.RDB.SAdd(myKey, videoId)
 		//将点赞信息保存到数据库
 		like := model.Like{
-			UserId:  int64(uId),
+			UserId:  userId,
 			VideoId: videoId,
 		}
 		if err := global.DB.Create(&like).Error; err != nil {
@@ -43,7 +43,7 @@ func (*InteractServer) FavoriteAction(ctx context.Context, req *proto.DouyinFavo
 	} else if actionType == 0 && !isMember.Val() { //取消点赞操作
 		global.RDB.SRem(myKey, videoId)
 		//将取消点赞信息保存到数据库
-		if res := global.DB.Where("user_id = ?, video_id = ?", uId, videoId).Delete(&model.Like{}); res.RowsAffected == 0 {
+		if res := global.DB.Where("user_id = ?, video_id = ?", userId, videoId).Delete(&model.Like{}); res.RowsAffected == 0 {
 			return nil, status.Errorf(codes.NotFound, "未点赞")
 		}
 		return &proto.DouyinFavoriteActionResponse{
@@ -98,13 +98,12 @@ func (*InteractServer) GetFavoriteList(ctx context.Context, req *proto.DouyinFav
 }
 
 func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinCommentActionRequest) (*proto.DouyinCommentActionResponse, error) {
-	claims, _ := myJwt.ParseToken(req.Token)
-	userId := claims.Id
+	tokenId, _ := jwt.ParseToken(strings.Fields(req.Token)[1])
+	userId, _ := strconv.ParseInt(tokenId.Id, 10, 64)
 	actionType := req.ActionType
-	uId, _ := strconv.Atoi(userId)
 	if actionType == 1 { //发表评论
 		comment := model.Comment{
-			UserId:      int64(uId),
+			UserId:      userId,
 			VideoId:     req.VideoId,
 			CommentText: req.CommentText,
 			CreateTime:  time.Time{},
@@ -113,7 +112,7 @@ func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinComme
 			return nil, err
 		}
 		userInfo, _ := global.VideoSrvClient.UserInfo(context.Background(), &proto.DouyinUserRequest{
-			UserId: int64(uId),
+			UserId: userId,
 			Token:  req.Token,
 		})
 		resp := proto.DouyinCommentActionResponse{
