@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"simple-DY/DY-srvs/interact-srv/global"
@@ -34,6 +35,7 @@ func (*InteractServer) FavoriteAction(ctx context.Context, req *proto.DouyinFavo
 			VideoId: videoId,
 		}
 		if err := global.DB.Create(&like).Error; err != nil {
+			zap.S().Error("create like err:", err.Error())
 			return nil, err
 		}
 		return &proto.DouyinFavoriteActionResponse{
@@ -68,7 +70,11 @@ func (*InteractServer) GetFavoriteList(ctx context.Context, req *proto.DouyinFav
 	var videos []*proto.Video
 	for _, videoId := range videoIds.Val() {
 		vid, _ := strconv.Atoi(videoId)
-		videoInfo, _ := global.VideoSrvClient.VideoInfo(context.Background(), &proto.DouyinVideoInfoRequest{VideoId: int64(vid)})
+		videoInfo, err := global.VideoSrvClient.VideoInfo(context.Background(), &proto.DouyinVideoInfoRequest{VideoId: int64(vid)})
+		if err != nil {
+			zap.S().Error("srv conn video.videoInfo err:", err.Error())
+			return nil, err
+		}
 		author := videoInfo.VideoList.Author
 		video := &proto.Video{
 			Id: int64(vid),
@@ -109,12 +115,16 @@ func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinComme
 			CreateTime:  time.Time{},
 		}
 		if err := global.DB.Create(&comment).Error; err != nil {
+			zap.S().Error("create comment err:", err.Error())
 			return nil, err
 		}
-		userInfo, _ := global.VideoSrvClient.UserInfo(context.Background(), &proto.DouyinUserRequest{
+		userInfo, err := global.VideoSrvClient.UserInfo(context.Background(), &proto.DouyinUserRequest{
 			UserId: userId,
 			Token:  req.Token,
 		})
+		if err != nil {
+			zap.S().Error("conn videoSrv.userInfo err:", err.Error())
+		}
 		resp := proto.DouyinCommentActionResponse{
 			StatusCode: 0,
 			StatusMsg:  "评论成功",
@@ -150,17 +160,18 @@ func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinComm
 	if res := global.DB.Where("video_id=?", req.VideoId).Find(&comments); res.RowsAffected == 0 {
 		resp := proto.DouyinCommentListResponse{
 			StatusCode:  0,
-			StatusMsg:   "获取评论成功",
+			StatusMsg:   "暂无评论",
 			CommentList: nil,
 		}
 		return &resp, nil
 	}
 	var commonLists []*proto.Comment
 	for _, comment := range comments {
-		userInfo, _ := global.VideoSrvClient.UserInfo(context.Background(), &proto.DouyinUserRequest{
+		userInfo, err := global.VideoSrvClient.UserInfo(context.Background(), &proto.DouyinUserRequest{
 			UserId: comment.UserId,
 			Token:  req.Token,
 		})
+		zap.S().Error("conn videoSrv.userInfo err:", err.Error())
 		commonList := &proto.Comment{
 			Id: comment.VideoId,
 			User: &proto.User{
