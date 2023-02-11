@@ -21,6 +21,11 @@ type SocialSrvConfig struct {
 	Name string `mapstructure:"name" json:"name"`
 }
 
+type RedisConfig struct {
+	Host     string `mapstructure:"host" json:"host"`
+	Password string `mapstructure:"password" json:"password"`
+}
+
 type ServerConfig struct {
 	Name          string          `mapstructure:"name" json:"name"`
 	Tags          []string        `mapstructure:"tags" json:"tags"`
@@ -29,6 +34,7 @@ type ServerConfig struct {
 	ConsulInfo    ConsulConfig    `mapstructure:"consul" json:"consul"`
 	SocialSrvInfo SocialSrvConfig `mapstructure:"social_srv" json:"social_srv"`
 	VideoSrvInfo  VideoSrvConfig  `mapstructure:"video_srv" json:"video_srv"`
+	RedisInfo     RedisConfig     `mapstructure:"redis" json:"redis"`
 }
 
 type NacosConfig struct {

@@ -8,9 +8,9 @@ import (
 func InitRedis() {
 	RDB := global.RDB
 	RDB = redis.NewClient(&redis.Options{
-		Addr:     "8.134.157.141:6379", // 指定
-		Password: "",
-		DB:       1, // redis一共16个库，指定其中一个库即可
+		Addr:     global.ServerConfig.RedisInfo.Host, // 指定
+		Password: global.ServerConfig.RedisInfo.Password,
+		DB:       0, // redis一共16个库，指定其中一个库即可
 	})
 	_, err := RDB.Ping().Result()
 	if err != nil {

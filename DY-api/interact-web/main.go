@@ -14,6 +14,7 @@ import (
 
 func main() {
 	// 1. 初始化操作
+	initialize.InitConfig()
 	// 初始化日志
 	initialize.InitLogger()
 	zap.S().Info("配置信息", global.ServerConfig)

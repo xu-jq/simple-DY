@@ -12,4 +12,6 @@ var (
 	ServerConfig *config.ServerConfig = &config.ServerConfig{}
 
 	InteractSrvClient proto.InteractServiceClient
+
+	NacosConfig config.NacosConfig
 )

@@ -1,4 +1,4 @@
-package initalize
+package initialize
 
 import (
 	"encoding/json"
@@ -8,13 +8,14 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"simple-DY/DY-srvs/interact-srv/global"
+	"simple-DY/DY-api/interact-web/global"
 )
 
 func InitConfig() {
 	//从配置文件中读取出对应的配置
+
 	configFilePrefix := "config"
-	configFileName := fmt.Sprintf("./%s-pro.yaml", configFilePrefix)
+	configFileName := fmt.Sprintf("DY-api/interact-web/%s-pro.yaml", configFilePrefix)
 	v := viper.New()
 	//文件的路径如何设置
 	v.SetConfigFile(configFileName)

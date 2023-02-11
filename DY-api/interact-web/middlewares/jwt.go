@@ -10,8 +10,8 @@ package middlewares
 import (
 	"errors"
 	"net/http"
-	"simple-DY/DY-api/social-web/global"
-	"simple-DY/DY-api/social-web/models"
+	"simple-DY/DY-api/interact-web/global"
+	"simple-DY/DY-api/interact-web/models"
 	"strconv"
 	"strings"
 	"time"
@@ -141,7 +141,7 @@ func GenerateToken(id int64) string {
 	zap.L().Info("开始产生Token...")
 
 	// 设置Token过期时间
-	expiresTime := time.Now().Unix() + global.ServerConfig.JWTInfo.TokenExpiresTime
+	expiresTime := time.Now().Unix() + 60*60*24
 	zap.L().Info("Token将于" + time.Unix(expiresTime, 0).Format(global.ServerConfig.JWTInfo.SigningKey) + "过期")
 
 	// 声明
