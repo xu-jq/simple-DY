@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"simple-DY/DY-srvs/interact-srv/global"
+	"simple-DY/DY-srvs/interact-srv/handler"
 	"simple-DY/DY-srvs/interact-srv/initalize"
 	"simple-DY/DY-srvs/interact-srv/proto"
 	"simple-DY/DY-srvs/interact-srv/utils"
@@ -20,7 +21,7 @@ import (
 )
 
 func main() {
-	IP := flag.String("ip", "0.0.0.0", "ip地址")
+	IP := flag.String("ip", "172.19.22.221", "ip地址")
 	Port := flag.Int("port", 8888, "端口号")
 
 	//初始化
@@ -39,7 +40,7 @@ func main() {
 	zap.S().Info("port: ", *Port)
 
 	server := grpc.NewServer()
-	proto.RegisterInteractServiceServer(server, &proto.UnimplementedInteractServiceServer{})
+	proto.RegisterInteractServiceServer(server, &handler.InteractServer{})
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
 		panic("failed to listen:" + err.Error())
