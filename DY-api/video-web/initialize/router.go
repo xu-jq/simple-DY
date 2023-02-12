@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-19 11:21:47
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 16:15:30
+ * @LastEditTime: 2023-02-10 17:44:02
  * @FilePath: /simple-DY/DY-api/video-web/initialize/router.go
  * @Description: 路由表
  */
@@ -39,17 +39,18 @@ func Routers(debug bool) *gin.Engine {
 	// 不限制登录状态，返回按投稿时间倒序的视频列表，视频数由服务端控制，单次最多30个
 	DouyinRouter.GET(
 		"/feed/",
+		middlewares.JWTGetToken(),
 		api.Feed,
 	)
 
 	// 1.2 视频上传及发布
 	PublishRouter := DouyinRouter.Group("/publish")
 	{
-		PublishRouter.Use(middlewares.JWTAuth())
 		// 1.2.1 视频发布列表
 		// 用户的视频发布列表，直接列出用户所有投稿过的视频
 		PublishRouter.GET(
 			"/list/",
+			middlewares.JWTGetToken(),
 			api.PublishList,
 		)
 
@@ -57,6 +58,7 @@ func Routers(debug bool) *gin.Engine {
 		// 登录用户选择视频上传
 		PublishRouter.POST(
 			"/action/",
+			middlewares.JWTAuth(),
 			api.PublishAction,
 		)
 	}
@@ -64,11 +66,11 @@ func Routers(debug bool) *gin.Engine {
 	// 1.3 用户操作
 	UserRouter := DouyinRouter.Group("/user")
 	{
+		UserRouter.Use(middlewares.JWTGetToken())
 		// 1.3.1 用户信息
 		// 获取用户的 id、昵称，如果实现社交部分的功能，还会返回关注数和粉丝数
 		UserRouter.GET(
 			"/",
-			middlewares.JWTAuth(),
 			api.UserInfo,
 		)
 

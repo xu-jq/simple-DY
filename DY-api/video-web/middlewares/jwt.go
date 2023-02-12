@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-28 20:53:39
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-02 16:26:31
+ * @LastEditTime: 2023-02-10 17:43:35
  * @FilePath: /simple-DY/DY-api/video-web/middlewares/jwt.go
  * @Description: JWT中间件
  */
@@ -56,6 +56,26 @@ func JWTAuth() gin.HandlerFunc {
 		}
 		c.Set("claims", claims)
 		c.Set("TokenId", claims.Id)
+		c.Next()
+	}
+}
+
+func JWTGetToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 我们这里jwt鉴权取头部信息 x-token 登录时回返回token信息 这里前端需要把token存储到cookie或者本地localSstorage中 不过需要跟后端协商过期时间 可以约定刷新令牌或者重新登录
+		// token不知道怎么取，都是直接放在请求里面的，就Get和Post都试一下吧
+		token := c.Query("token")
+		if token == "" {
+			token = c.PostForm("token")
+		}
+		if token != "" {
+			j := NewJWT()
+			claims, err := j.ParseToken(strings.Fields(token)[1])
+			if err == nil {
+				c.Set("claims", claims)
+				c.Set("TokenId", claims.Id)
+			}
+		}
 		c.Next()
 	}
 }
