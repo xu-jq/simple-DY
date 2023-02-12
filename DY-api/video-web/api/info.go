@@ -1,13 +1,14 @@
 /*
  * @Date: 2023-02-02 18:44:40
  * @LastEditors: zhang zhao
- * @LastEditTime: 2023-02-05 19:13:24
+ * @LastEditTime: 2023-02-12 22:39:34
  * @FilePath: /simple-DY/DY-api/video-web/api/info.go
  * @Description: 工具api
  */
 package api
 
 import (
+	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -60,7 +61,7 @@ func userService(c *gin.Context, idString string) (id, followCount, followerCoun
 		}
 		// 遍历列表进行查找
 		for _, user := range responseFollowerList.UserList {
-			if user.Id == myId {
+			if strconv.FormatInt(user.Id, 10) == myId {
 				isFollow = true
 			}
 		}
@@ -102,8 +103,9 @@ func videoService(c *gin.Context, videoIdString string) (favoriteCount, commentC
 		favoriteCount = int64(len(responseLikeVideo.UserId))
 		// 遍历列表进行查找
 		for _, user := range responseLikeVideo.UserId {
-			if user == myId {
+			if strconv.FormatInt(user, 10) == myId {
 				isFavorite = true
+				break
 			}
 		}
 	}()
