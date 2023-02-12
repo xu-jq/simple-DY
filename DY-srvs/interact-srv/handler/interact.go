@@ -163,7 +163,9 @@ func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinComme
 
 func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinCommentListRequest) (*proto.DouyinCommentListResponse, error) {
 	var comments []*model.Comments
-	if res := global.DB.Where("video_id=?", req.VideoId).Find(&comments); res.RowsAffected == 0 {
+	res := global.DB.Where("video_id=?", req.VideoId).Find(&comments)
+	zap.S().Info("sqlErr:", res.Error)
+	if res.RowsAffected == 0 {
 		resp := proto.DouyinCommentListResponse{
 			StatusCode:  0,
 			StatusMsg:   "暂无评论",
@@ -177,7 +179,9 @@ func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinComm
 			UserId: comment.UserId,
 			Token:  req.Token,
 		})
-		zap.S().Error("conn videoSrv.userInfo err:", err.Error())
+		if err != nil {
+			zap.S().Error("conn videoSrv.userInfo err:", err.Error())
+		}
 		commonList := &proto.Comment{
 			Id: comment.VideoId,
 			User: &proto.User{
