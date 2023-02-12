@@ -40,17 +40,18 @@ func LikeAction(ctx *gin.Context) {
 }
 
 func LikeList(ctx *gin.Context) {
-	uId := ctx.GetInt64("user_id")
-	token := ctx.GetString("token")
-	if token == "" || uId == 0 {
+	uId := ctx.Query("user_id")
+	token := ctx.Query("token")
+	if token == "" || uId == "" {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status_code": -1,
 			"status_msg":  "参数异常",
 		})
 		return
 	}
+	userId, _ := strconv.Atoi(uId)
 	resp, err := global.InteractSrvClient.GetFavoriteList(context.Background(), &proto.DouyinFavoriteListRequest{
-		UserId: uId,
+		UserId: int64(userId),
 		Token:  token,
 	})
 	if err != nil {

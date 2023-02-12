@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"simple-DY/DY-api/interact-web/global"
 	"simple-DY/DY-api/interact-web/proto"
+	"strconv"
 )
 
 func CommentAction(ctx *gin.Context) {
@@ -79,9 +80,10 @@ func CommentAction(ctx *gin.Context) {
 }
 
 func CommentList(ctx *gin.Context) {
-	token := ctx.GetString("token")
-	vId := ctx.GetInt64("video_id")
-	if token == "" || vId == 0 {
+	token := ctx.Query("token")
+	vId := ctx.Query("video_id")
+	videoId, _ := strconv.Atoi(vId)
+	if token == "" || videoId == 0 {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status_code": -1,
 			"status_msg":  "参数异常",
@@ -90,7 +92,7 @@ func CommentList(ctx *gin.Context) {
 	}
 	resp, err := global.InteractSrvClient.GetCommentList(ctx, &proto.DouyinCommentListRequest{
 		Token:   token,
-		VideoId: vId,
+		VideoId: int64(videoId),
 	})
 	if err != nil {
 		zap.S().Error("CommentList：", err)
