@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
@@ -22,7 +23,7 @@ func LikeAction(ctx *gin.Context) {
 		})
 		return
 	}
-	resp, err := global.InteractSrvClient.FavoriteAction(ctx, &proto.DouyinFavoriteActionRequest{
+	resp, err := global.InteractSrvClient.FavoriteAction(context.Background(), &proto.DouyinFavoriteActionRequest{
 		Token:      ctx.Query("token"),
 		VideoId:    int64(videoId),
 		ActionType: int32(actionType),
@@ -48,7 +49,7 @@ func LikeList(ctx *gin.Context) {
 		})
 		return
 	}
-	resp, err := global.InteractSrvClient.GetFavoriteList(ctx, &proto.DouyinFavoriteListRequest{
+	resp, err := global.InteractSrvClient.GetFavoriteList(context.Background(), &proto.DouyinFavoriteListRequest{
 		UserId: uId,
 		Token:  token,
 	})

@@ -15,7 +15,7 @@ func InitConfig() {
 	//从配置文件中读取出对应的配置
 
 	configFilePrefix := "config"
-	configFileName := fmt.Sprintf("DY-api/interact-web/%s-pro.yaml", configFilePrefix)
+	configFileName := fmt.Sprintf("%s-pro.yaml", configFilePrefix)
 	v := viper.New()
 	//文件的路径如何设置
 	v.SetConfigFile(configFileName)
