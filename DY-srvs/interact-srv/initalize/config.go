@@ -13,8 +13,7 @@ import (
 
 func InitConfig() {
 	//从配置文件中读取出对应的配置
-	configFilePrefix := "config"
-	configFileName := fmt.Sprintf("./%s-pro.yaml", configFilePrefix)
+	configFileName := "config-pro.yaml"
 	v := viper.New()
 	//文件的路径如何设置
 	v.SetConfigFile(configFileName)
