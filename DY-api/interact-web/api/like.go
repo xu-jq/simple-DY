@@ -16,6 +16,9 @@ func LikeAction(ctx *gin.Context) {
 	videoId, _ := strconv.Atoi(vid)
 	actionType, _ := strconv.Atoi(aType)
 	token := ctx.Query("token")
+	zap.S().Info("token:", token)
+	zap.S().Info("video_id:", vid)
+	zap.S().Info("actionType:", actionType)
 	if videoId == 0 || token == "" || actionType == 0 {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status_code": -1,
@@ -42,6 +45,8 @@ func LikeAction(ctx *gin.Context) {
 func LikeList(ctx *gin.Context) {
 	uId := ctx.Query("user_id")
 	token := ctx.Query("token")
+	zap.S().Info("token:", token)
+	zap.S().Info("user_id:", uId)
 	if token == "" || uId == "" {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status_code": -1,

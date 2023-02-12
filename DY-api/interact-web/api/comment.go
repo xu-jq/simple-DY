@@ -10,18 +10,22 @@ import (
 )
 
 func CommentAction(ctx *gin.Context) {
-	token := ctx.GetString("token")
-	vId := ctx.GetInt64("video_id")
-	actionType := ctx.GetInt("action_type")
-	if token == "" || vId == 0 || actionType == 0 {
+	token := ctx.Query("token")
+	vId := ctx.Query("video_id")
+	zap.S().Info("token:", token)
+	zap.S().Info("video_id:", vId)
+	actionType := ctx.Query("action_type")
+	aType, _ := strconv.Atoi(actionType)
+	if token == "" || vId == "" || aType == 0 {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status_code": -1,
 			"status_msg":  "参数异常",
 		})
 		return
 	}
-	if actionType == 1 {
-		commentText := ctx.GetString("comment_text")
+	vid, _ := strconv.Atoi(vId)
+	if aType == 1 {
+		commentText := ctx.Query("comment_text")
 		if commentText == "" {
 			ctx.JSON(http.StatusOK, gin.H{
 				"status_code": -1,
@@ -31,8 +35,8 @@ func CommentAction(ctx *gin.Context) {
 		}
 		resp, err := global.InteractSrvClient.CommentAction(ctx, &proto.DouyinCommentActionRequest{
 			Token:       token,
-			VideoId:     vId,
-			ActionType:  int32(actionType),
+			VideoId:     int64(vid),
+			ActionType:  int32(aType),
 			CommentText: commentText,
 		})
 		if err != nil {
@@ -45,9 +49,10 @@ func CommentAction(ctx *gin.Context) {
 			"status_msg":  resp.StatusMsg,
 			"comment":     resp.Comment,
 		})
-	} else if actionType == 2 {
-		commentId := ctx.GetInt64("comment_id")
-		if commentId == 0 {
+	} else if aType == 2 {
+		commentId := ctx.Query("comment_id")
+		cId, _ := strconv.Atoi(commentId)
+		if cId == 0 {
 			ctx.JSON(http.StatusOK, gin.H{
 				"status_code": -1,
 				"status_msg":  "参数异常",
@@ -56,9 +61,9 @@ func CommentAction(ctx *gin.Context) {
 		}
 		resp, err := global.InteractSrvClient.CommentAction(ctx, &proto.DouyinCommentActionRequest{
 			Token:      token,
-			VideoId:    vId,
-			ActionType: int32(actionType),
-			CommentId:  commentId,
+			VideoId:    int64(vid),
+			ActionType: int32(aType),
+			CommentId:  int64(cId),
 		})
 		if err != nil {
 			zap.S().Error("CommentAction：", err)
@@ -82,6 +87,8 @@ func CommentAction(ctx *gin.Context) {
 func CommentList(ctx *gin.Context) {
 	token := ctx.Query("token")
 	vId := ctx.Query("video_id")
+	zap.S().Info("token:", token)
+	zap.S().Info("video_id:", vId)
 	videoId, _ := strconv.Atoi(vId)
 	if token == "" || videoId == 0 {
 		ctx.JSON(http.StatusOK, gin.H{

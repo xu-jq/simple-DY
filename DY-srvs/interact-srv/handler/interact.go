@@ -21,16 +21,20 @@ type InteractServer struct {
 
 func (*InteractServer) FavoriteAction(ctx context.Context, req *proto.DouyinFavoriteActionRequest) (*proto.DouyinFavoriteActionResponse, error) {
 	// 解析token得到user.id
-	tokenId, _ := jwt.ParseToken(strings.Fields(req.Token)[1])
+	tokenId, err := jwt.ParseToken(strings.Fields(req.Token)[1])
+	if err != nil {
+		zap.S().Error("token:", err.Error())
+		return nil, err
+	}
 	userId, _ := strconv.ParseInt(tokenId.Id, 10, 64)
 	videoId := req.VideoId
 	actionType := req.ActionType
 	myKey := key.KeyUserFavorite(userId)             // 点赞key
 	isMember := global.RDB.SIsMember(myKey, videoId) // 判断是否点赞
-	if actionType == 1 && isMember.Val() {           // 点赞操作
+	if actionType == 1 && !isMember.Val() {          // 点赞操作
 		global.RDB.SAdd(myKey, videoId)
 		//将点赞信息保存到数据库
-		like := model.Like{
+		like := model.Likes{
 			UserId:  userId,
 			VideoId: videoId,
 		}
@@ -42,12 +46,10 @@ func (*InteractServer) FavoriteAction(ctx context.Context, req *proto.DouyinFavo
 			StatusCode: 0,
 			StatusMsg:  "点赞成功",
 		}, nil
-	} else if actionType == 0 && !isMember.Val() { //取消点赞操作
+	} else if actionType == 2 && isMember.Val() { //取消点赞操作
 		global.RDB.SRem(myKey, videoId)
 		//将取消点赞信息保存到数据库
-		if res := global.DB.Where("user_id = ?, video_id = ?", userId, videoId).Delete(&model.Like{}); res.RowsAffected == 0 {
-			return nil, status.Errorf(codes.NotFound, "未点赞")
-		}
+		global.DB.Where("user_id = ? and video_id = ?", userId, videoId).Delete(&model.Likes{})
 		return &proto.DouyinFavoriteActionResponse{
 			StatusCode: 0,
 			StatusMsg:  "取消点赞成功",
@@ -104,15 +106,19 @@ func (*InteractServer) GetFavoriteList(ctx context.Context, req *proto.DouyinFav
 }
 
 func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinCommentActionRequest) (*proto.DouyinCommentActionResponse, error) {
-	tokenId, _ := jwt.ParseToken(strings.Fields(req.Token)[1])
+	tokenId, err := jwt.ParseToken(strings.Fields(req.Token)[1])
+	if err != nil {
+		zap.S().Error("token:", err.Error())
+		return nil, err
+	}
 	userId, _ := strconv.ParseInt(tokenId.Id, 10, 64)
 	actionType := req.ActionType
 	if actionType == 1 { //发表评论
-		comment := model.Comment{
+		comment := model.Comments{
 			UserId:      userId,
 			VideoId:     req.VideoId,
 			CommentText: req.CommentText,
-			CreateTime:  time.Time{},
+			CreateTime:  time.Now(),
 		}
 		if err := global.DB.Create(&comment).Error; err != nil {
 			zap.S().Error("create comment err:", err.Error())
@@ -143,7 +149,7 @@ func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinComme
 		}
 		return &resp, nil
 	} else if actionType == 2 { //删除评论
-		if res := global.DB.Where("id = ?", req.CommentId).Delete(&model.Comment{}); res.RowsAffected == 0 {
+		if res := global.DB.Where("id = ?", req.CommentId).Delete(&model.Comments{}); res.RowsAffected == 0 {
 			return nil, status.Errorf(codes.NotFound, "未找到该评论")
 		}
 		resp := proto.DouyinCommentActionResponse{
@@ -156,7 +162,7 @@ func (*InteractServer) CommentAction(ctx context.Context, req *proto.DouyinComme
 }
 
 func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinCommentListRequest) (*proto.DouyinCommentListResponse, error) {
-	var comments []*model.Comment
+	var comments []*model.Comments
 	if res := global.DB.Where("video_id=?", req.VideoId).Find(&comments); res.RowsAffected == 0 {
 		resp := proto.DouyinCommentListResponse{
 			StatusCode:  0,
@@ -167,7 +173,7 @@ func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinComm
 	}
 	var commonLists []*proto.Comment
 	for _, comment := range comments {
-		userInfo, err := global.VideoSrvClient.UserInfo(context.Background(), &proto.DouyinUserRequest{
+		userInfo, err := global.VideoSrvClient.UserInfo(ctx, &proto.DouyinUserRequest{
 			UserId: comment.UserId,
 			Token:  req.Token,
 		})
@@ -195,7 +201,7 @@ func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinComm
 }
 
 func (*InteractServer) GetLikeVideoUserId(ctx context.Context, req *proto.DouyinLikeVideoRequest) (*proto.DouyinLikeVideoResponse, error) {
-	var likes []*model.Like
+	var likes []*model.Likes
 	if res := global.DB.Where("video_id=?", req.VideoId).Find(&likes); res.RowsAffected == 0 {
 		return &proto.DouyinLikeVideoResponse{
 			VideoId: req.VideoId,

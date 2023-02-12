@@ -1,5 +1,9 @@
 package config
 
+type JWTConfig struct {
+	SigningKey string `mapstructure:"key" json:"key"`
+}
+
 type MysqlConfig struct {
 	Host     string `mapstructure:"host" json:"host"`
 	Port     int    `mapstructure:"port" json:"port"`
@@ -35,6 +39,7 @@ type ServerConfig struct {
 	SocialSrvInfo SocialSrvConfig `mapstructure:"social_srv" json:"social_srv"`
 	VideoSrvInfo  VideoSrvConfig  `mapstructure:"video_srv" json:"video_srv"`
 	RedisInfo     RedisConfig     `mapstructure:"redis" json:"redis"`
+	JWTInfo       JWTConfig       `mapstructure:"jwt" json:"jwt"`
 }
 
 type NacosConfig struct {

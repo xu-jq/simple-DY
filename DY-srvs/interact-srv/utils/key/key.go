@@ -1,8 +1,8 @@
 package key
 
-import "fmt"
+import "strconv"
 
-func KeyUserFavorite(uid interface{}) string {
-	key := fmt.Sprintf("uid:%s", uid)
+func KeyUserFavorite(uid int64) string {
+	key := "uid" + strconv.FormatInt(uid, 10)
 	return key
 }

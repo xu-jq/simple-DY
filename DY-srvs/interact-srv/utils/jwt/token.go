@@ -9,7 +9,7 @@
 package jwt
 
 import (
-	"simple-DY/DY-srvs/video-srv/global"
+	"simple-DY/DY-srvs/interact-srv/global"
 	"strconv"
 	"time"
 
@@ -26,8 +26,8 @@ func GenerateToken(id int64) string {
 	zap.L().Info("开始产生Token...")
 
 	// 设置Token过期时间
-	expiresTime := time.Now().Unix() + global.GlobalConfig.JWT.TokenExpiresTime
-	zap.L().Info("Token将于" + time.Unix(expiresTime, 0).Format(global.GlobalConfig.Time.TimeFormat) + "过期")
+	expiresTime := time.Now().Unix() + 60*60*24
+	//zap.L().Info("Token将于" + time.Unix(expiresTime, 0).Format(global.GlobalConfig.Time.TimeFormat) + "过期")
 
 	// 声明
 	claims := jwt.StandardClaims{
@@ -41,7 +41,7 @@ func GenerateToken(id int64) string {
 
 	// 生成Token
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString([]byte(global.GlobalConfig.JWT.Secret))
+	token, err := tokenClaims.SignedString([]byte(global.ServerConfig.JWTInfo.SigningKey))
 
 	// 判断生成Token是否成功
 	if err != nil {
@@ -60,7 +60,7 @@ func GenerateToken(id int64) string {
  */
 func ParseToken(token string) (*jwt.StandardClaims, error) {
 	jwtToken, err := jwt.ParseWithClaims(token, &jwt.StandardClaims{}, func(token *jwt.Token) (i interface{}, e error) {
-		return []byte(global.GlobalConfig.JWT.Secret), nil
+		return []byte(global.ServerConfig.JWTInfo.SigningKey), nil
 	})
 	if err == nil && jwtToken != nil {
 		if claim, ok := jwtToken.Claims.(*jwt.StandardClaims); ok && jwtToken.Valid {

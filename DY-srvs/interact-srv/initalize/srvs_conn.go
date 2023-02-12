@@ -2,6 +2,7 @@ package initalize
 
 import (
 	"fmt"
+	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"simple-DY/DY-srvs/interact-srv/global"
