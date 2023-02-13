@@ -111,7 +111,7 @@ func GetFriendList(ctx *gin.Context) {
 		return
 	}
 	for _, v := range list.UserList {
-		userList = append(userList, v.Id)
+		userList = append(userList, v)
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": 0,

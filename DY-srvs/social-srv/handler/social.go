@@ -79,9 +79,22 @@ func (s *SocialServer) GetFriendList(c context.Context, req *proto.GetFriendList
 	zap.S().Info(result)
 	resp := &proto.GetFriendListResponse{}
 	for _, v := range follows {
-		resp.UserList = append(resp.UserList, &proto.User{
-			Id:   v.Id,
-			Name: v.Name,
+		msg := &model.Messages{}
+		global.DB.Raw("SELECT * FROM `messages` WHERE (user_id =? and to_user_id = ?) or (user_id =? and to_user_id = ?) "+
+			"ORDER BY sent_time desc LIMIT 0,1", req.UserId, v.FollowerID, v.FollowerID, req.UserId).First(&msg)
+		resMsg := ""
+		if msg.Content != "" {
+			resMsg = msg.Content
+		}
+		msgType := 1
+		if msg.ToUserID == req.UserId {
+			msgType = 0
+		}
+		resp.UserList = append(resp.UserList, &proto.FriendUser{
+			Message: resMsg,
+			MsgType: int64(msgType),
+			Id:      v.Id,
+			Name:    v.Name,
 		})
 	}
 	return resp, nil
@@ -135,6 +148,8 @@ func (s *SocialServer) MsgChat(c context.Context, req *proto.MsgChatRequest) (*p
 		zap.S().Info("时间：", createTime)
 		resp = append(resp, &proto.Msg{
 			Id:         v.ID,
+			ToUserId:   v.ToUserID,
+			FromUserId: v.UserID,
 			Content:    v.Content,
 			CreateTime: createTime,
 		})

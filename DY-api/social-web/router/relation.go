@@ -20,7 +20,7 @@ func InitRelationRouter(Router *gin.RouterGroup) {
 		relationRouter.GET("/follow/list/", middlewares.JWTAuth(), api.GetFollowList)
 		relationRouter.GET("/follower/list/", middlewares.JWTAuth(), api.GetFollowerList)
 		// friend 就是关注的用户
-		relationRouter.GET("/friend/list/", middlewares.JWTAuth(), api.GetFollowerList)
+		relationRouter.GET("/friend/list/", middlewares.JWTAuth(), api.GetFriendList)
 		relationRouter.POST("/action/", middlewares.JWTAuth(), api.RelationAction)
 
 	}
