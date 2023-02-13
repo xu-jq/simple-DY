@@ -1,7 +1,0 @@
-host: '8.134.157.141'
-port: 8848
-namespace: 'eeaf8414-ef0d-425d-b34f-cd65b1f084d5'
-user: 'nacos'
-password: 'nacos'
-dataid: 'interact-web'
-group: 'dev'
