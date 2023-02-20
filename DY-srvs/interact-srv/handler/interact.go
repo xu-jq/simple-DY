@@ -78,6 +78,10 @@ func (*InteractServer) GetFavoriteList(ctx context.Context, req *proto.DouyinFav
 			return nil, err
 		}
 		author := videoInfo.VideoList.Author
+		if author == nil {
+			zap.S().Error("this author is nil")
+			return nil, err
+		}
 		video := &proto.Video{
 			Id: int64(vid),
 			Author: &proto.User{
@@ -181,6 +185,10 @@ func (*InteractServer) GetCommentList(ctx context.Context, req *proto.DouyinComm
 		})
 		if err != nil {
 			zap.S().Error("conn videoSrv.userInfo err:", err.Error())
+		}
+		if userInfo == nil {
+			zap.S().Error("user is nil")
+			return nil, err
 		}
 		commonList := &proto.Comment{
 			Id: comment.VideoId,
