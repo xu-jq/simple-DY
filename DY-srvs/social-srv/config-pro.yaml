@@ -11,3 +11,9 @@ consul:
   #host: '124.221.120.88'
   host: '121.37.98.68'
   port: 8500
+
+amqp:
+  host: '121.37.98.68'
+  port: 5672
+  user: 'root'
+  password: 'QxdkQeiIUNY'

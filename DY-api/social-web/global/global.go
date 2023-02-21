@@ -6,8 +6,8 @@ package global
 
 import (
 	ut "github.com/go-playground/universal-translator"
-	"simple-DY/DY-api/social-web/config"
-	"simple-DY/DY-api/social-web/proto"
+	"simple-DY/DY-srvs/social-srv/config"
+	"simple-DY/DY-srvs/social-srv/proto"
 )
 
 var (

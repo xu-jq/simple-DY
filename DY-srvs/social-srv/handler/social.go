@@ -50,16 +50,32 @@ func (s *SocialServer) GetFollowerList(c context.Context, req *proto.FollowerLis
 	result := global.DB.Debug().Raw("SELECT users.name,users.id,follows.user_id,follows.follower_id "+
 		"FROM follows LEFT JOIN users ON follows.follower_id = users.id where user_id = ?", req.UserId).
 		Find(&follows)
+	var follow []model.FollowsAndUser
+	getFollow := global.DB.Debug().Raw("select follows.user_id FROM follows where follower_id = ?", req.UserId).
+		Find(&follow)
 	if result.Error != nil {
 		zap.S().Error("GetFollowList出错：", result.Error)
 		return nil, result.Error
 	}
+	if getFollow.Error != nil {
+		zap.S().Error("GetFollowList出错：", getFollow.Error)
+		return nil, result.Error
+	}
+	followMap := make(map[int64]struct{}, 0)
+	for _, v := range follow {
+		followMap[v.UserID] = struct{}{}
+	}
 	zap.S().Info(result)
 	resp := &proto.FollowerListResponse{}
 	for _, v := range follows {
+		isFollow := false
+		if _, ok := followMap[v.Id]; ok {
+			isFollow = true
+		}
 		resp.UserList = append(resp.UserList, &proto.User{
-			Id:   v.Id,
-			Name: v.Name,
+			Id:       v.Id,
+			Name:     v.Name,
+			IsFollow: isFollow,
 		})
 	}
 	return resp, nil
@@ -134,6 +150,7 @@ func (s *SocialServer) RelationAction(c context.Context, req *proto.RelationActi
 
 func (s *SocialServer) MsgChat(c context.Context, req *proto.MsgChatRequest) (*proto.MsgChatResponse, error) {
 	zap.S().Info("MsgChat Running")
+	zap.S().Info("MsgChat 参数：", req)
 	var mesList []model.Messages
 	result := global.DB.Debug().Where("(user_id =? and to_user_id = ?) "+
 		"or (user_id =? and to_user_id = ?)", req.UserId, req.ToUserId, req.ToUserId, req.UserId).Order("sent_time").
@@ -143,15 +160,15 @@ func (s *SocialServer) MsgChat(c context.Context, req *proto.MsgChatRequest) (*p
 		return nil, result.Error
 	}
 	var resp []*proto.Msg
+	count := 0
 	for _, v := range mesList {
-		createTime := v.SentTime.Format("2006-1-2 15:04:05")
-		zap.S().Info("时间：", createTime)
+		count++
 		resp = append(resp, &proto.Msg{
 			Id:         v.ID,
 			ToUserId:   v.ToUserID,
 			FromUserId: v.UserID,
 			Content:    v.Content,
-			CreateTime: createTime,
+			CreateTime: int64(count),
 		})
 	}
 	return &proto.MsgChatResponse{MessageList: resp}, nil
